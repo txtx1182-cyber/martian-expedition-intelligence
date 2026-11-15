@@ -38,6 +38,10 @@ export default function MarsTrekMap({
   // Map Zoom State
   const [currentZoom, setCurrentZoom] = useState(11);
 
+  // Computed Thermal Opacity (0.0 to 1.0)
+  const rawThermal = layerOpacities.thermal ?? layerOpacities.themis_ir ?? 0;
+  const thermalOpacity = rawThermal > 1 ? rawThermal / 100 : rawThermal;
+
   // Estimate elevation in Jezero from planetocentric lat/lng
   const estimateElevation = (lat, lng) => {
     // Basin floor is ~-2570m in the east, delta is ~-2400m, Neretva is ~-2350m, western rim is ~-1800m
@@ -65,6 +69,11 @@ export default function MarsTrekMap({
       const overlayPane = map.createPane('highResOverlayPane');
       overlayPane.style.zIndex = 450;
       overlayPane.style.pointerEvents = 'none';
+    }
+
+    if (!map.getPane('thermalPane')) {
+      const thermalPane = map.createPane('thermalPane');
+      thermalPane.style.zIndex = 480;
     }
 
     if (!map.getPane('routePane')) {
@@ -364,22 +373,24 @@ export default function MarsTrekMap({
     }
   }, [activeMapMode, layerOpacities, currentZoom]);
 
-  // Manage THEMIS Thermal Inertia Overlay Updates
+  // Manage THEMIS Thermal Inertia Overlay Updates (Strictly in thermalPane zIndex: 480)
   useEffect(() => {
     const themisGroup = themisLayerGroupRef.current;
     if (!themisGroup) return;
 
     themisGroup.clearLayers();
-    const opacity = layerOpacities.themis_ir ?? 0;
-    if (opacity <= 0.01) return;
+    const rawOpacity = layerOpacities.thermal ?? layerOpacities.themis_ir ?? 0;
+    const opacity = rawOpacity > 1 ? rawOpacity / 100 : rawOpacity;
+    if (opacity <= 0.005) return;
 
     THEMIS_THERMAL_INERTIA_ZONES.forEach(zone => {
       const isHigh = zone.type === 'HIGH_INERTIA_BEDROCK';
       const polygon = L.polygon(zone.coords, {
+        pane: 'thermalPane',
         color: zone.color,
         fillColor: zone.fillColor,
-        fillOpacity: opacity * 0.45,
-        opacity: opacity * 0.85,
+        fillOpacity: opacity * 0.55,
+        opacity: opacity,
         weight: isHigh ? 2 : 1.5,
         dashArray: isHigh ? 'none' : '4 3'
       }).addTo(themisGroup);
@@ -392,14 +403,14 @@ export default function MarsTrekMap({
           <div class="text-[10px] font-mono text-slate-700 mt-0.5">
             <strong>Thermal Inertia:</strong> ${zone.inertiaValue}
           </div>
-          <div class="text-[10px] text-slate-500 mt-0.5">
+          <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">
             ${zone.description}
           </div>
         </div>`,
         { sticky: true, className: 'leaflet-custom-tooltip' }
       );
     });
-  }, [layerOpacities.themis_ir]);
+  }, [layerOpacities.thermal, layerOpacities.themis_ir]);
 
   // Manage MEDA Atmospheric & Weather Vector Overlay Updates
   useEffect(() => {
@@ -634,6 +645,46 @@ export default function MarsTrekMap({
           <span>
             {currentZoom >= 13 ? 'NASA HiRISE Tier 2: Outcrop Sub-Meter (~0.25 m/px)' : 'NASA HiRISE Tier 1: Western Delta (~0.5 m/px)'}
           </span>
+        </div>
+      )}
+
+      {/* THEMIS Thermal Inertia Floating Legend Pill (Appears only while thermal layer opacity > 0%) */}
+      {thermalOpacity > 0.005 && (
+        <div 
+          className="absolute bottom-56 right-4 bg-white/95 backdrop-blur-sm border border-terracotta-400 rounded-xl p-2.5 shadow-lg z-20 text-[10px] font-mono space-y-1.5 max-w-[270px] pointer-events-auto transition-all duration-200"
+          style={{ opacity: Math.min(1, thermalOpacity + 0.25) }}
+        >
+          <div className="flex items-center justify-between border-b border-slate-200 pb-1">
+            <span className="font-bold text-slate-900 flex items-center space-x-1.5 font-display text-xs">
+              <span className="w-2 h-2 rounded-full bg-[#EA580C] animate-pulse"></span>
+              <span>THEMIS Thermal Inertia</span>
+            </span>
+            <span className="font-mono text-[9px] font-bold text-terracotta-800 bg-terracotta-100 px-1.5 py-0.5 rounded border border-terracotta-300">
+              {Math.round(thermalOpacity * 100)}%
+            </span>
+          </div>
+
+          <div className="space-y-1 text-slate-700">
+            <div className="flex items-center space-x-2">
+              <span className="w-3.5 h-2.5 bg-[#EA580C] border border-[#F97316] rounded-xs shrink-0 shadow-xs"></span>
+              <div className="leading-tight">
+                <strong className="text-slate-900 block font-semibold text-[10px]">High Inertia Bedrock / Boulders</strong>
+                <span className="text-slate-500 text-[9px]">390–560 J • Delta Scarp, Séítah, Rim</span>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <span className="w-3.5 h-2.5 bg-[#0284C7] border border-[#38BDF8] rounded-xs shrink-0 shadow-xs"></span>
+              <div className="leading-tight">
+                <strong className="text-slate-900 block font-semibold text-[10px]">Low Inertia Fine Dust</strong>
+                <span className="text-slate-500 text-[9px]">120–205 J • Basin Plains (T1)</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-[8.5px] font-mono text-slate-500 pt-1 border-t border-slate-200 leading-tight">
+            ~100 m/px regional context only • Do not infer boulder-scale safety
+          </div>
         </div>
       )}
 

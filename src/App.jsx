@@ -54,10 +54,12 @@ export default function App() {
   const [hoveredTraversePoint, setHoveredTraversePoint] = useState(null);
 
   const handleOpacityChange = (layerId, newOpacity) => {
-    setLayerOpacities(prev => ({
-      ...prev,
-      [layerId]: newOpacity
-    }));
+    setLayerOpacities(prev => {
+      const updated = { ...prev, [layerId]: newOpacity };
+      if (layerId === 'themis_ir') updated.thermal = newOpacity;
+      if (layerId === 'thermal') updated.themis_ir = newOpacity;
+      return updated;
+    });
   };
 
   // Compute active route points based on active tab

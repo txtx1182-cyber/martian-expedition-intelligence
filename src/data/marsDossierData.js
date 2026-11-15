@@ -623,96 +623,127 @@ export const SLOPE_HAZARD_ZONES = [
 export const THEMIS_THERMAL_INERTIA_ZONES = [
   {
     id: "themis-hi-delta-scarp",
-    name: "High Thermal Inertia: Western Delta Scarp & Cliff Retaining Outcrops",
+    name: "High Thermal Inertia: Western Delta Scarp (T4–T5)",
     type: "HIGH_INERTIA_BEDROCK",
     inertiaValue: "420–510 J·m⁻²·K⁻¹·s⁻½",
-    color: "#EA580C", // Warm Amber/Terracotta
+    color: "#F97316", // Warm Amber-Orange
     fillColor: "#EA580C",
-    description: "Exposed, indurated deltaic bedrock pavement and boulder lag deposits with minimal fine dust mantling.",
+    description: "Exposed, indurated deltaic bedrock pavement and cliff-retaining scarps that retain heat after sunset.",
     coords: [
-      [18.468, 77.348],
-      [18.498, 77.338],
-      [18.522, 77.368],
-      [18.508, 77.392],
-      [18.478, 77.382],
-      [18.462, 77.358]
+      [18.455, 77.340],
+      [18.475, 77.330],
+      [18.510, 77.335],
+      [18.525, 77.375],
+      [18.505, 77.395],
+      [18.475, 77.385],
+      [18.450, 77.360]
+    ]
+  },
+  {
+    id: "themis-hi-neretva-canyon",
+    name: "High Thermal Inertia: Neretva Vallis Canyon Walls & Bright Angel (T6–T7)",
+    type: "HIGH_INERTIA_BEDROCK",
+    inertiaValue: "440–530 J·m⁻²·K⁻¹·s⁻½",
+    color: "#F97316",
+    fillColor: "#EA580C",
+    description: "Steep incised canyon bedrock walls, fluvial boulder lags, and exposed redox mudstones.",
+    coords: [
+      [18.485, 77.255],
+      [18.525, 77.265],
+      [18.515, 77.325],
+      [18.480, 77.320]
     ]
   },
   {
     id: "themis-hi-seitah-ridge",
-    name: "High Thermal Inertia: Séítah Olivine Cumulate Ridge",
+    name: "High Thermal Inertia: Séítah Fractured Bedrock Ridge (T2)",
     type: "HIGH_INERTIA_BEDROCK",
     inertiaValue: "390–480 J·m⁻²·K⁻¹·s⁻½",
-    color: "#EA580C",
+    color: "#F97316",
     fillColor: "#EA580C",
-    description: "Coarse crystalline olivine cumulate bedrock; high thermal conductivity.",
+    description: "Coarse crystalline olivine cumulate bedrock with high thermal conductivity.",
     coords: [
-      [18.418, 77.418],
-      [18.448, 77.432],
-      [18.458, 77.458],
-      [18.432, 77.462],
-      [18.412, 77.432]
+      [18.410, 77.415],
+      [18.445, 77.428],
+      [18.460, 77.455],
+      [18.435, 77.465],
+      [18.410, 77.435]
     ]
   },
   {
     id: "themis-hi-west-rim",
-    name: "High Thermal Inertia: West Crater Rim Rocky Uplands",
+    name: "High Thermal Inertia: Jezero Crater Rim & Margin Uplands (T8–T9)",
     type: "HIGH_INERTIA_BEDROCK",
-    inertiaValue: "450–550 J·m⁻²·K⁻¹·s⁻½",
-    color: "#EA580C",
+    inertiaValue: "460–560 J·m⁻²·K⁻¹·s⁻½",
+    color: "#F97316",
     fillColor: "#EA580C",
-    description: "Noachian megabreccia bedrock and impact ejecta blocks along the crater rim.",
+    description: "Noachian basement megabreccia bedrock and impact ejecta blocks along the crater rim.",
     coords: [
-      [18.350, 77.195],
-      [18.555, 77.205],
-      [18.535, 77.255],
-      [18.355, 77.245]
+      [18.330, 77.180],
+      [18.560, 77.195],
+      [18.540, 77.265],
+      [18.345, 77.250]
     ]
   },
   {
     id: "themis-hi-belva-rim",
-    name: "High Thermal Inertia: Belva Crater Impact Rim Escarpment",
+    name: "High Thermal Inertia: Belva Crater Impact Rim Ring",
     type: "HIGH_INERTIA_BEDROCK",
     inertiaValue: "410–490 J·m⁻²·K⁻¹·s⁻½",
-    color: "#EA580C",
+    color: "#F97316",
     fillColor: "#EA580C",
-    description: "Crater-rim ejecta and uplifted layered delta blocks.",
+    description: "Uplifted impact-crater rim blocks and erosion-resistant ejecta ridges.",
     coords: [
-      [18.472, 77.338],
-      [18.502, 77.342],
-      [18.512, 77.378],
-      [18.488, 77.388],
-      [18.468, 77.368]
+      [18.468, 77.335],
+      [18.505, 77.340],
+      [18.515, 77.380],
+      [18.485, 77.390],
+      [18.465, 77.365]
     ]
   },
   {
     id: "themis-lo-east-floor",
-    name: "Low Thermal Inertia: Eastern Crater Floor Eolian Dust Plain",
+    name: "Low Thermal Inertia: Eastern Crater Floor Plains (T1 Basin)",
     type: "LOW_INERTIA_DUST",
-    inertiaValue: "130–190 J·m⁻²·K⁻¹·s⁻½",
-    color: "#0284C7", // Cool Slate-Blue
+    inertiaValue: "120–185 J·m⁻²·K⁻¹·s⁻½",
+    color: "#38BDF8", // Cool Thermal Blue
     fillColor: "#0284C7",
-    description: "Thick unconsolidated eolian dust mantles and high-porosity silt deposits.",
+    description: "Thick fine-grained eolian dust mantles and unconsolidated sand sheets that cool rapidly at night.",
     coords: [
-      [18.405, 77.465],
-      [18.515, 77.505],
-      [18.495, 77.605],
-      [18.375, 77.555]
+      [18.400, 77.455],
+      [18.510, 77.495],
+      [18.490, 77.615],
+      [18.365, 77.565]
     ]
   },
   {
     id: "themis-lo-north-basin",
-    name: "Low Thermal Inertia: North-Eastern Basin Sedimentary Wash",
+    name: "Low Thermal Inertia: North-Eastern Sedimentary Basin Wash",
     type: "LOW_INERTIA_DUST",
-    inertiaValue: "140–210 J·m⁻²·K⁻¹·s⁻½",
-    color: "#0284C7",
+    inertiaValue: "135–205 J·m⁻²·K⁻¹·s⁻½",
+    color: "#38BDF8",
     fillColor: "#0284C7",
-    description: "Fine sediment accumulation with high diurnal surface temperature swing.",
+    description: "Fine sediment accumulation and eolian dust deposits with high diurnal temperature swings.",
     coords: [
-      [18.495, 77.415],
-      [18.565, 77.445],
-      [18.545, 77.545],
-      [18.475, 77.495]
+      [18.490, 77.405],
+      [18.565, 77.435],
+      [18.545, 77.550],
+      [18.470, 77.500]
+    ]
+  },
+  {
+    id: "themis-lo-south-trap",
+    name: "Low Thermal Inertia: Southern Eolian Sand & Dune Sheet Basin",
+    type: "LOW_INERTIA_DUST",
+    inertiaValue: "125–195 J·m⁻²·K⁻¹·s⁻½",
+    color: "#38BDF8",
+    fillColor: "#0284C7",
+    description: "Unconsolidated active sand ripple traps and low-inertia dust veneer.",
+    coords: [
+      [18.355, 77.385],
+      [18.415, 77.395],
+      [18.395, 77.485],
+      [18.345, 77.455]
     ]
   }
 ];

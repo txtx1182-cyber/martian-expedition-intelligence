@@ -108,9 +108,19 @@ export default function TraversePlannerDrawer({
     }
   ];
 
+  const getLayerOpacity = (layerId) => {
+    if (layerId === 'themis_ir' || layerId === 'thermal') {
+      return layerOpacities.thermal ?? layerOpacities.themis_ir ?? 0;
+    }
+    return layerOpacities[layerId] ?? 0;
+  };
+
   const handleSoloLayer = (layerId) => {
     LAYER_CARDS.forEach(layer => {
-      onOpacityChange(layer.id, layer.id === layerId ? 1.0 : 0.0);
+      const isTarget = layer.id === layerId;
+      onOpacityChange(layer.id, isTarget ? 1.0 : 0.0);
+      if (layer.id === 'themis_ir') onOpacityChange('thermal', isTarget ? 1.0 : 0.0);
+      if (layer.id === 'thermal') onOpacityChange('themis_ir', isTarget ? 1.0 : 0.0);
     });
     if (onSelectMapMode) {
       onSelectMapMode('FREE_BLEND');
@@ -118,31 +128,32 @@ export default function TraversePlannerDrawer({
   };
 
   const handleToggleVisibility = (layerId) => {
-    const currentVal = layerOpacities[layerId] ?? 0;
-    if (currentVal > 0) {
-      onOpacityChange(layerId, 0.0);
-    } else {
-      const def = LAYER_CARDS.find(l => l.id === layerId)?.defaultVal || 1.0;
-      onOpacityChange(layerId, def);
-    }
+    const currentVal = getLayerOpacity(layerId);
+    const nextVal = currentVal > 0 ? 0.0 : (LAYER_CARDS.find(l => l.id === layerId)?.defaultVal || 1.0);
+    onOpacityChange(layerId, nextVal);
+    if (layerId === 'themis_ir') onOpacityChange('thermal', nextVal);
+    if (layerId === 'thermal') onOpacityChange('themis_ir', nextVal);
     if (onSelectMapMode) {
       onSelectMapMode('FREE_BLEND');
     }
   };
 
   const handleSliderChange = (layerId, percent) => {
-    onOpacityChange(layerId, Math.max(0, Math.min(100, percent)) / 100);
+    const val = Math.max(0, Math.min(100, percent)) / 100;
+    onOpacityChange(layerId, val);
+    if (layerId === 'themis_ir') onOpacityChange('thermal', val);
+    if (layerId === 'thermal') onOpacityChange('themis_ir', val);
     if (onSelectMapMode) {
       onSelectMapMode('FREE_BLEND');
     }
   };
 
   const isSoloLayer = (layerId) => {
-    const thisVal = Math.round((layerOpacities[layerId] ?? 0) * 100);
+    const thisVal = Math.round(getLayerOpacity(layerId) * 100);
     if (thisVal < 95) return false;
     return LAYER_CARDS.every(l => {
       if (l.id === layerId) return true;
-      const otherVal = Math.round((layerOpacities[l.id] ?? 0) * 100);
+      const otherVal = Math.round(getLayerOpacity(l.id) * 100);
       return otherVal === 0;
     });
   };
@@ -587,10 +598,10 @@ export default function TraversePlannerDrawer({
               </p>
             </div>
 
-            {/* Unified 4-Layer Card Stack */}
+            {/* Unified 6-Layer Card Stack */}
             <div className="space-y-2">
               {LAYER_CARDS.map(layer => {
-                const currentVal = layerOpacities[layer.id] ?? 0;
+                const currentVal = getLayerOpacity(layer.id);
                 const opacityPct = Math.round(currentVal * 100);
                 const isActive = opacityPct > 0;
                 const isSolo = isSoloLayer(layer.id);
