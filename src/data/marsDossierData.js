@@ -503,72 +503,131 @@ export const NASA_TILE_LAYERS = [
   }
 ];
 
-// CRISM Spectral Mineralogy Vector Polygons
+// CRISM Spectral Mineralogy Vector Polygons (USGS Photogeologic Contours: 25–40 vertices each)
 export const CRISM_MINERAL_POLYGONS = [
   {
-    id: "crism-olivine-seitah",
-    name: "Olivine + Mg-Fe Carbonates (Séítah Cumulate)",
-    mineral: "Olivine (Fo45-Fo65) & Grain-Boundary Carbonates",
-    color: "#10B981", // Emerald
-    fillColor: "#10B981",
-    fillOpacity: 0.35,
-    weight: 2,
-    targetAnchor: "T2: South Séítah",
+    id: "crism-smectites-delta",
+    name: "Western Delta Lobate Fan (Smectite Clays / Shenandoah Fm)",
+    shortLabel: "Delta",
+    unitLabel: "Western Delta Fan",
+    labelAnchor: [18.490, 77.362],
+    mineral: "Nontronite / Saponite Fe/Mg Smectites & Lacustrine Mudstones",
+    color: "#2DD4BF", // Muted Seafoam Teal
+    fillColor: "#2DD4BF",
+    fillOpacity: 0.36,
+    weight: 1.4,
+    targetAnchor: "T4: Delta Front",
     coords: [
-      [18.4200, 77.4250],
-      [18.4420, 77.4280],
-      [18.4500, 77.4480],
-      [18.4350, 77.4600],
-      [18.4180, 77.4450]
+      [18.5042, 77.2980], [18.5065, 77.3040], [18.5090, 77.3115], [18.5130, 77.3200],
+      [18.5175, 77.3290], [18.5215, 77.3400], [18.5255, 77.3520], [18.5275, 77.3640],
+      [18.5260, 77.3760], [18.5210, 77.3870], [18.5140, 77.3960], [18.5050, 77.4030],
+      [18.4970, 77.4045], [18.4895, 77.3990], [18.4840, 77.3940], [18.4795, 77.3980],
+      [18.4735, 77.4010], [18.4660, 77.3960], [18.4600, 77.3870], [18.4550, 77.3765],
+      [18.4515, 77.3650], [18.4500, 77.3530], [18.4510, 77.3415], [18.4550, 77.3320],
+      [18.4620, 77.3250], [18.4685, 77.3210], [18.4750, 77.3260], [18.4820, 77.3240],
+      [18.4880, 77.3180], [18.4925, 77.3110], [18.4965, 77.3045], [18.4995, 77.2995],
+      [18.5020, 77.2965], [18.5035, 77.2970]
     ]
   },
   {
-    id: "crism-smectites-delta",
-    name: "Fe/Mg Phyllosilicates & Smectite Clays (Western Delta)",
-    mineral: "Nontronite / Saponite Smectite Clays",
-    color: "#0284C7", // Cyan
-    fillColor: "#0284C7",
-    fillOpacity: 0.35,
-    weight: 2,
-    targetAnchor: "T4: Delta Front",
+    id: "crism-carbonates-margin",
+    name: "Marginal Carbonate Belt (Margin Unit)",
+    shortLabel: "Margin Unit",
+    unitLabel: "Marginal Carbonates",
+    labelAnchor: [18.485, 77.278],
+    mineral: "Magnesite, Stromatolitic Hydrated Carbonates & Siliceous Chert",
+    color: "#6366F1", // Muted Periwinkle-Indigo
+    fillColor: "#6366F1",
+    fillOpacity: 0.36,
+    weight: 1.4,
+    targetAnchor: "T8: Margin Unit",
     coords: [
-      [18.4750, 77.3400],
-      [18.5020, 77.3350],
-      [18.5080, 77.3600],
-      [18.4900, 77.3850],
-      [18.4720, 77.3750]
+      [18.4350, 77.2460], [18.4460, 77.2510], [18.4580, 77.2560], [18.4710, 77.2610],
+      [18.4840, 77.2660], [18.4965, 77.2715], [18.5090, 77.2785], [18.5210, 77.2880],
+      [18.5315, 77.3000], [18.5390, 77.3140], [18.5420, 77.3280], [18.5375, 77.3360],
+      [18.5280, 77.3310], [18.5190, 77.3210], [18.5100, 77.3110], [18.5005, 77.3020],
+      [18.4910, 77.2940], [18.4810, 77.2870], [18.4705, 77.2810], [18.4600, 77.2755],
+      [18.4500, 77.2700], [18.4400, 77.2635], [18.4320, 77.2560], [18.4260, 77.2485],
+      [18.4230, 77.2420], [18.4270, 77.2410], [18.4310, 77.2435]
+    ]
+  },
+  {
+    id: "crism-crater-rim",
+    name: "Western Crater Rim Crest & Fault Scarp",
+    shortLabel: "Crater Rim",
+    unitLabel: "Western Crater Rim",
+    labelAnchor: [18.448, 77.190],
+    mineral: "Noachian Basement Megabreccia & Impact Uplifted Bedrock",
+    color: "#8B5CF6", // Muted Slate-Violet
+    fillColor: "#8B5CF6",
+    fillOpacity: 0.36,
+    weight: 1.4,
+    targetAnchor: "T9: West Rim Uplands",
+    coords: [
+      [18.3220, 77.1850], [18.3420, 77.1820], [18.3640, 77.1800], [18.3860, 77.1790],
+      [18.4080, 77.1800], [18.4310, 77.1825], [18.4540, 77.1865], [18.4770, 77.1925],
+      [18.5000, 77.2015], [18.5220, 77.2135], [18.5430, 77.2285], [18.5620, 77.2470],
+      [18.5750, 77.2680], [18.5800, 77.2820], [18.5730, 77.2890], [18.5580, 77.2710],
+      [18.5410, 77.2520], [18.5220, 77.2350], [18.5010, 77.2205], [18.4800, 77.2095],
+      [18.4580, 77.2010], [18.4360, 77.1950], [18.4130, 77.1920], [18.3900, 77.1915],
+      [18.3680, 77.1930], [18.3470, 77.1965], [18.3280, 77.2025], [18.3180, 77.2060]
+    ]
+  },
+  {
+    id: "crism-olivine-seitah",
+    name: "Séítah Olivine Cumulate Ridge",
+    shortLabel: "Séítah",
+    unitLabel: "Séítah Cumulate",
+    labelAnchor: [18.435, 77.438],
+    mineral: "Olivine (Fo45-Fo65) & Interstitial Grain-Boundary Carbonates",
+    color: "#10B981", // Muted Sage-Emerald
+    fillColor: "#10B981",
+    fillOpacity: 0.36,
+    weight: 1.4,
+    targetAnchor: "T2: South Séítah",
+    coords: [
+      [18.4120, 77.4200], [18.4180, 77.4150], [18.4260, 77.4135], [18.4345, 77.4150],
+      [18.4420, 77.4195], [18.4485, 77.4260], [18.4545, 77.4340], [18.4590, 77.4435],
+      [18.4610, 77.4530], [18.4585, 77.4615], [18.4530, 77.4670], [18.4455, 77.4690],
+      [18.4380, 77.4670], [18.4310, 77.4625], [18.4245, 77.4560], [18.4190, 77.4485],
+      [18.4145, 77.4405], [18.4115, 77.4320], [18.4105, 77.4250]
+    ]
+  },
+  {
+    id: "crism-floor-maaz",
+    name: "Crater Floor Basalts & Máaz Formation",
+    shortLabel: "Crater Floor",
+    unitLabel: "Crater Floor Basalt",
+    labelAnchor: [18.455, 77.452],
+    mineral: "Plagioclase-Pyroxene Basaltic Lava Flows & Layered Sills",
+    color: "#C2410C", // Muted Terracotta
+    fillColor: "#C2410C",
+    fillOpacity: 0.36,
+    weight: 1.4,
+    targetAnchor: "T3: Máaz Formation",
+    coords: [
+      [18.4350, 77.4310], [18.4440, 77.4350], [18.4530, 77.4310], [18.4620, 77.4295],
+      [18.4705, 77.4340], [18.4760, 77.4430], [18.4775, 77.4540], [18.4740, 77.4645],
+      [18.4670, 77.4725], [18.4580, 77.4765], [18.4480, 77.4760], [18.4390, 77.4715],
+      [18.4320, 77.4630], [18.4285, 77.4520], [18.4290, 77.4410], [18.4315, 77.4340]
     ]
   },
   {
     id: "crism-redox-brightangel",
     name: "Redox Front: Vivianite (Fe-PO4) & Greigite (Fe-S)",
-    mineral: "Vivianite, Greigite, Calcium Sulfate & Organic Carbon",
+    shortLabel: "Redox Front",
+    unitLabel: "Bright Angel Redox",
+    labelAnchor: [18.502, 77.308],
+    mineral: "Vivianite, Greigite, Calcium Sulfate & Organic Carbon Blebs",
     color: "#D97706", // Amber
     fillColor: "#D97706",
     fillOpacity: 0.45,
-    weight: 2.5,
+    weight: 1.4,
     targetAnchor: "T7: Bright Angel Outcrop",
     coords: [
-      [18.4920, 77.2980],
-      [18.5030, 77.2990],
-      [18.5040, 77.3120],
-      [18.4940, 77.3140]
-    ]
-  },
-  {
-    id: "crism-carbonates-margin",
-    name: "Lacustrine Shoreline Carbonates (Margin Unit)",
-    mineral: "Magnesite, Hydrated Carbonates & Siliceous Chert",
-    color: "#7C3AED", // Violet
-    fillColor: "#7C3AED",
-    fillOpacity: 0.35,
-    weight: 2,
-    targetAnchor: "T8: Margin Unit",
-    coords: [
-      [18.4480, 77.2500],
-      [18.4750, 77.2550],
-      [18.4800, 77.2800],
-      [18.4550, 77.2780]
+      [18.4935, 77.2965], [18.4970, 77.2985], [18.5010, 77.3015], [18.5045, 77.3055],
+      [18.5065, 77.3105], [18.5060, 77.3150], [18.5030, 77.3175], [18.4990, 77.3170],
+      [18.4950, 77.3140], [18.4920, 77.3090], [18.4910, 77.3035], [18.4920, 77.2990]
     ]
   }
 ];
@@ -583,10 +642,11 @@ export const SLOPE_HAZARD_ZONES = [
     fillColor: "#EF4444",
     fillOpacity: 0.40,
     coords: [
-      [18.32, 77.08],
-      [18.42, 77.10],
-      [18.43, 77.16],
-      [18.34, 77.15]
+      [18.3220, 77.1850], [18.3420, 77.1820], [18.3640, 77.1800], [18.3860, 77.1790],
+      [18.4080, 77.1800], [18.4310, 77.1825], [18.4540, 77.1865], [18.4770, 77.1925],
+      [18.5000, 77.2015], [18.5220, 77.2135], [18.5430, 77.2285], [18.5620, 77.2470],
+      [18.5750, 77.2680], [18.5650, 77.2600], [18.5450, 77.2400], [18.5200, 77.2250],
+      [18.4950, 77.2100], [18.4650, 77.2000], [18.4350, 77.1950], [18.4000, 77.1920]
     ]
   },
   {
@@ -597,10 +657,9 @@ export const SLOPE_HAZARD_ZONES = [
     fillColor: "#F97316",
     fillOpacity: 0.35,
     coords: [
-      [18.4810, 77.3640],
-      [18.4880, 77.3620],
-      [18.4910, 77.3710],
-      [18.4830, 77.3730]
+      [18.4795, 77.3980], [18.4840, 77.3940], [18.4895, 77.3990], [18.4970, 77.4045],
+      [18.5050, 77.4030], [18.5140, 77.3960], [18.5210, 77.3870], [18.5160, 77.3920],
+      [18.5020, 77.3980], [18.4920, 77.3960], [18.4850, 77.3900], [18.4750, 77.3920]
     ]
   },
   {
@@ -611,32 +670,32 @@ export const SLOPE_HAZARD_ZONES = [
     fillColor: "#059669",
     fillOpacity: 0.30,
     coords: [
-      [18.51, 77.25],
-      [18.54, 77.25],
-      [18.54, 77.28],
-      [18.51, 77.28]
+      [18.5050, 77.2940], [18.5120, 77.2980], [18.5180, 77.3050], [18.5220, 77.3150],
+      [18.5200, 77.3220], [18.5140, 77.3150], [18.5080, 77.3050], [18.5020, 77.2980]
     ]
   }
 ];
 
-// THEMIS Day/Night Infrared Thermal Inertia Polygons
+// THEMIS Day/Night Infrared Thermal Inertia Polygons (USGS High-Density Smooth Contours)
 export const THEMIS_THERMAL_INERTIA_ZONES = [
   {
     id: "themis-hi-delta-scarp",
     name: "High Thermal Inertia: Western Delta Scarp (T4–T5)",
     type: "HIGH_INERTIA_BEDROCK",
     inertiaValue: "420–510 J·m⁻²·K⁻¹·s⁻½",
-    color: "#F97316", // Warm Amber-Orange
+    color: "#1E293B", // Solid fine geological contact line
     fillColor: "#EA580C",
     description: "Exposed, indurated deltaic bedrock pavement and cliff-retaining scarps that retain heat after sunset.",
     coords: [
-      [18.455, 77.340],
-      [18.475, 77.330],
-      [18.510, 77.335],
-      [18.525, 77.375],
-      [18.505, 77.395],
-      [18.475, 77.385],
-      [18.450, 77.360]
+      [18.5042, 77.2980], [18.5065, 77.3040], [18.5090, 77.3115], [18.5130, 77.3200],
+      [18.5175, 77.3290], [18.5215, 77.3400], [18.5255, 77.3520], [18.5275, 77.3640],
+      [18.5260, 77.3760], [18.5210, 77.3870], [18.5140, 77.3960], [18.5050, 77.4030],
+      [18.4970, 77.4045], [18.4895, 77.3990], [18.4840, 77.3940], [18.4795, 77.3980],
+      [18.4735, 77.4010], [18.4660, 77.3960], [18.4600, 77.3870], [18.4550, 77.3765],
+      [18.4515, 77.3650], [18.4500, 77.3530], [18.4510, 77.3415], [18.4550, 77.3320],
+      [18.4620, 77.3250], [18.4685, 77.3210], [18.4750, 77.3260], [18.4820, 77.3240],
+      [18.4880, 77.3180], [18.4925, 77.3110], [18.4965, 77.3045], [18.4995, 77.2995],
+      [18.5020, 77.2965], [18.5035, 77.2970]
     ]
   },
   {
@@ -644,14 +703,13 @@ export const THEMIS_THERMAL_INERTIA_ZONES = [
     name: "High Thermal Inertia: Neretva Vallis Canyon Walls & Bright Angel (T6–T7)",
     type: "HIGH_INERTIA_BEDROCK",
     inertiaValue: "440–530 J·m⁻²·K⁻¹·s⁻½",
-    color: "#F97316",
+    color: "#1E293B",
     fillColor: "#EA580C",
     description: "Steep incised canyon bedrock walls, fluvial boulder lags, and exposed redox mudstones.",
     coords: [
-      [18.485, 77.255],
-      [18.525, 77.265],
-      [18.515, 77.325],
-      [18.480, 77.320]
+      [18.4850, 77.2550], [18.4980, 77.2600], [18.5120, 77.2650], [18.5250, 77.2720],
+      [18.5220, 77.2850], [18.5150, 77.3000], [18.5080, 77.3150], [18.5000, 77.3250],
+      [18.4920, 77.3200], [18.4850, 77.3100], [18.4800, 77.2950], [18.4800, 77.2750]
     ]
   },
   {
@@ -659,15 +717,15 @@ export const THEMIS_THERMAL_INERTIA_ZONES = [
     name: "High Thermal Inertia: Séítah Fractured Bedrock Ridge (T2)",
     type: "HIGH_INERTIA_BEDROCK",
     inertiaValue: "390–480 J·m⁻²·K⁻¹·s⁻½",
-    color: "#F97316",
+    color: "#1E293B",
     fillColor: "#EA580C",
     description: "Coarse crystalline olivine cumulate bedrock with high thermal conductivity.",
     coords: [
-      [18.410, 77.415],
-      [18.445, 77.428],
-      [18.460, 77.455],
-      [18.435, 77.465],
-      [18.410, 77.435]
+      [18.4120, 77.4200], [18.4180, 77.4150], [18.4260, 77.4135], [18.4345, 77.4150],
+      [18.4420, 77.4195], [18.4485, 77.4260], [18.4545, 77.4340], [18.4590, 77.4435],
+      [18.4610, 77.4530], [18.4585, 77.4615], [18.4530, 77.4670], [18.4455, 77.4690],
+      [18.4380, 77.4670], [18.4310, 77.4625], [18.4245, 77.4560], [18.4190, 77.4485],
+      [18.4145, 77.4405], [18.4115, 77.4320], [18.4105, 77.4250]
     ]
   },
   {
@@ -675,30 +733,17 @@ export const THEMIS_THERMAL_INERTIA_ZONES = [
     name: "High Thermal Inertia: Jezero Crater Rim & Margin Uplands (T8–T9)",
     type: "HIGH_INERTIA_BEDROCK",
     inertiaValue: "460–560 J·m⁻²·K⁻¹·s⁻½",
-    color: "#F97316",
+    color: "#1E293B",
     fillColor: "#EA580C",
     description: "Noachian basement megabreccia bedrock and impact ejecta blocks along the crater rim.",
     coords: [
-      [18.330, 77.180],
-      [18.560, 77.195],
-      [18.540, 77.265],
-      [18.345, 77.250]
-    ]
-  },
-  {
-    id: "themis-hi-belva-rim",
-    name: "High Thermal Inertia: Belva Crater Impact Rim Ring",
-    type: "HIGH_INERTIA_BEDROCK",
-    inertiaValue: "410–490 J·m⁻²·K⁻¹·s⁻½",
-    color: "#F97316",
-    fillColor: "#EA580C",
-    description: "Uplifted impact-crater rim blocks and erosion-resistant ejecta ridges.",
-    coords: [
-      [18.468, 77.335],
-      [18.505, 77.340],
-      [18.515, 77.380],
-      [18.485, 77.390],
-      [18.465, 77.365]
+      [18.3220, 77.1850], [18.3420, 77.1820], [18.3640, 77.1800], [18.3860, 77.1790],
+      [18.4080, 77.1800], [18.4310, 77.1825], [18.4540, 77.1865], [18.4770, 77.1925],
+      [18.5000, 77.2015], [18.5220, 77.2135], [18.5430, 77.2285], [18.5620, 77.2470],
+      [18.5750, 77.2680], [18.5800, 77.2820], [18.5730, 77.2890], [18.5580, 77.2710],
+      [18.5410, 77.2520], [18.5220, 77.2350], [18.5010, 77.2205], [18.4800, 77.2095],
+      [18.4580, 77.2010], [18.4360, 77.1950], [18.4130, 77.1920], [18.3900, 77.1915],
+      [18.3680, 77.1930], [18.3470, 77.1965], [18.3280, 77.2025], [18.3180, 77.2060]
     ]
   },
   {
@@ -706,14 +751,14 @@ export const THEMIS_THERMAL_INERTIA_ZONES = [
     name: "Low Thermal Inertia: Eastern Crater Floor Plains (T1 Basin)",
     type: "LOW_INERTIA_DUST",
     inertiaValue: "120–185 J·m⁻²·K⁻¹·s⁻½",
-    color: "#38BDF8", // Cool Thermal Blue
-    fillColor: "#0284C7",
+    color: "#1E293B",
+    fillColor: "#0284C7", // Cool Thermal Blue
     description: "Thick fine-grained eolian dust mantles and unconsolidated sand sheets that cool rapidly at night.",
     coords: [
-      [18.400, 77.455],
-      [18.510, 77.495],
-      [18.490, 77.615],
-      [18.365, 77.565]
+      [18.3950, 77.4520], [18.4150, 77.4600], [18.4400, 77.4720], [18.4650, 77.4850],
+      [18.4900, 77.5020], [18.5150, 77.5250], [18.5300, 77.5550], [18.5250, 77.5850],
+      [18.5050, 77.6100], [18.4750, 77.6250], [18.4400, 77.6200], [18.4050, 77.6000],
+      [18.3750, 77.5700], [18.3600, 77.5350], [18.3650, 77.4950], [18.3800, 77.4680]
     ]
   },
   {
@@ -721,29 +766,13 @@ export const THEMIS_THERMAL_INERTIA_ZONES = [
     name: "Low Thermal Inertia: North-Eastern Sedimentary Basin Wash",
     type: "LOW_INERTIA_DUST",
     inertiaValue: "135–205 J·m⁻²·K⁻¹·s⁻½",
-    color: "#38BDF8",
+    color: "#1E293B",
     fillColor: "#0284C7",
     description: "Fine sediment accumulation and eolian dust deposits with high diurnal temperature swings.",
     coords: [
-      [18.490, 77.405],
-      [18.565, 77.435],
-      [18.545, 77.550],
-      [18.470, 77.500]
-    ]
-  },
-  {
-    id: "themis-lo-south-trap",
-    name: "Low Thermal Inertia: Southern Eolian Sand & Dune Sheet Basin",
-    type: "LOW_INERTIA_DUST",
-    inertiaValue: "125–195 J·m⁻²·K⁻¹·s⁻½",
-    color: "#38BDF8",
-    fillColor: "#0284C7",
-    description: "Unconsolidated active sand ripple traps and low-inertia dust veneer.",
-    coords: [
-      [18.355, 77.385],
-      [18.415, 77.395],
-      [18.395, 77.485],
-      [18.345, 77.455]
+      [18.4900, 77.4100], [18.5100, 77.4200], [18.5350, 77.4350], [18.5550, 77.4550],
+      [18.5680, 77.4850], [18.5620, 77.5180], [18.5450, 77.5450], [18.5150, 77.5500],
+      [18.4850, 77.5350], [18.4680, 77.5050], [18.4650, 77.4700], [18.4750, 77.4350]
     ]
   }
 ];

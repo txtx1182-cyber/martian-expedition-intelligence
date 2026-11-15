@@ -183,17 +183,33 @@ export default function MarsTrekMap({
 
     // ==========================================================
     // 3. CRISM SPECTRAL MINERALOGY OVERLAYS
+    // Authentic USGS Contact Lines & Permanent Geological Unit Labels
     // ==========================================================
     const crismGroup = L.layerGroup().addTo(map);
     CRISM_MINERAL_POLYGONS.forEach(poly => {
       const polygon = L.polygon(poly.coords, {
         pane: 'scientificOverlaysPane',
-        color: poly.color,
+        color: '#1E293B',
+        weight: 1.4,
+        opacity: 0.75,
+        dashArray: null,
         fillColor: poly.fillColor,
-        fillOpacity: poly.fillOpacity,
-        weight: 2,
-        dashArray: '4 4'
+        fillOpacity: poly.fillOpacity || 0.36,
+        smoothFactor: 2.0
       }).addTo(crismGroup);
+
+      if (poly.labelAnchor && poly.shortLabel) {
+        L.marker(poly.labelAnchor, {
+          icon: L.divIcon({
+            html: `<span class="geologic-unit-label">${poly.shortLabel}</span>`,
+            className: 'geologic-unit-label-wrapper',
+            iconSize: [80, 20],
+            iconAnchor: [40, 10]
+          }),
+          pane: 'scientificOverlaysPane',
+          interactive: false
+        }).addTo(crismGroup);
+      }
 
       polygon.bindTooltip(
         `<div class="p-1 font-sans text-xs">
@@ -217,8 +233,9 @@ export default function MarsTrekMap({
         color: zone.color,
         fillColor: zone.fillColor,
         fillOpacity: zone.fillOpacity,
-        weight: 2,
-        dashArray: isShelter ? '2 3' : '6 4'
+        weight: isShelter ? 1.4 : 1.8,
+        dashArray: isShelter ? '3 3' : '6 4',
+        smoothFactor: 2.0
       }).addTo(hazardGroup);
 
       polygon.bindTooltip(
@@ -386,15 +403,15 @@ export default function MarsTrekMap({
     if (opacity <= 0.005) return;
 
     THEMIS_THERMAL_INERTIA_ZONES.forEach(zone => {
-      const isHigh = zone.type === 'HIGH_INERTIA_BEDROCK';
       const polygon = L.polygon(zone.coords, {
         pane: 'scientificOverlaysPane',
-        color: zone.color,
+        color: '#1E293B',
         fillColor: zone.fillColor,
-        fillOpacity: opacity * 0.55,
-        opacity: opacity,
-        weight: isHigh ? 2 : 1.5,
-        dashArray: isHigh ? 'none' : '4 3'
+        fillOpacity: opacity * 0.36,
+        opacity: opacity * 0.75,
+        weight: 1.4,
+        dashArray: null,
+        smoothFactor: 2.0
       }).addTo(themisGroup);
 
       polygon.bindTooltip(
