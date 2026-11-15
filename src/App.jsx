@@ -18,7 +18,9 @@ export default function App() {
     mars_optical: 1.0,
     mola_color: 0.0,
     mola_gray: 0.0,
-    celestia_shaded: 0.0
+    celestia_shaded: 0.0,
+    themis_ir: 0.0,
+    meda_atmos: 0.0
   });
 
   // Active Target ID (Default to T7 Bright Angel / Cheyava Falls)

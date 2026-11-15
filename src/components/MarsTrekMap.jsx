@@ -3,7 +3,9 @@ import L from 'leaflet';
 import { 
   VERIFIED_TARGETS, 
   CRISM_MINERAL_POLYGONS, 
-  SLOPE_HAZARD_ZONES 
+  SLOPE_HAZARD_ZONES,
+  THEMIS_THERMAL_INERTIA_ZONES,
+  MEDA_ATMOSPHERIC_DATA
 } from '../data/marsDossierData';
 
 export default function MarsTrekMap({
@@ -25,6 +27,8 @@ export default function MarsTrekMap({
   const routeBadgeMarkersRef = useRef([]);
   const crismLayerGroupRef = useRef(null);
   const hazardLayerGroupRef = useRef(null);
+  const themisLayerGroupRef = useRef(null);
+  const medaLayerGroupRef = useRef(null);
   const hoverMarkerRef = useRef(null);
 
   // High-Res Zoom-Triggered Image Overlays Refs
@@ -216,6 +220,14 @@ export default function MarsTrekMap({
     });
     hazardLayerGroupRef.current = hazardGroup;
 
+    // THEMIS Thermal Inertia Layer Group
+    const themisGroup = L.layerGroup().addTo(map);
+    themisLayerGroupRef.current = themisGroup;
+
+    // MEDA Atmospheric & Weather Vector Layer Group
+    const medaGroup = L.layerGroup().addTo(map);
+    medaLayerGroupRef.current = medaGroup;
+
     // ==========================================================
     // 5. RESEARCH TARGET MARKERS (T1–T9)
     // Strictly in markerPane above all image overlays
@@ -351,6 +363,122 @@ export default function MarsTrekMap({
       tier2.setOpacity(0.98);
     }
   }, [activeMapMode, layerOpacities, currentZoom]);
+
+  // Manage THEMIS Thermal Inertia Overlay Updates
+  useEffect(() => {
+    const themisGroup = themisLayerGroupRef.current;
+    if (!themisGroup) return;
+
+    themisGroup.clearLayers();
+    const opacity = layerOpacities.themis_ir ?? 0;
+    if (opacity <= 0.01) return;
+
+    THEMIS_THERMAL_INERTIA_ZONES.forEach(zone => {
+      const isHigh = zone.type === 'HIGH_INERTIA_BEDROCK';
+      const polygon = L.polygon(zone.coords, {
+        color: zone.color,
+        fillColor: zone.fillColor,
+        fillOpacity: opacity * 0.45,
+        opacity: opacity * 0.85,
+        weight: isHigh ? 2 : 1.5,
+        dashArray: isHigh ? 'none' : '4 3'
+      }).addTo(themisGroup);
+
+      polygon.bindTooltip(
+        `<div class="p-1.5 font-sans text-xs max-w-xs">
+          <div class="font-bold font-display" style="color: ${zone.color}">
+            ${zone.name}
+          </div>
+          <div class="text-[10px] font-mono text-slate-700 mt-0.5">
+            <strong>Thermal Inertia:</strong> ${zone.inertiaValue}
+          </div>
+          <div class="text-[10px] text-slate-500 mt-0.5">
+            ${zone.description}
+          </div>
+        </div>`,
+        { sticky: true, className: 'leaflet-custom-tooltip' }
+      );
+    });
+  }, [layerOpacities.themis_ir]);
+
+  // Manage MEDA Atmospheric & Weather Vector Overlay Updates
+  useEffect(() => {
+    const medaGroup = medaLayerGroupRef.current;
+    if (!medaGroup) return;
+
+    medaGroup.clearLayers();
+    const opacity = layerOpacities.meda_atmos ?? 0;
+    if (opacity <= 0.01) return;
+
+    // 1. Regional Dust Opacity Tint
+    const dustHaze = L.rectangle(MEDA_ATMOSPHERIC_DATA.dustHazeBounds, {
+      color: '#D97706',
+      fillColor: '#D97706',
+      fillOpacity: opacity * 0.14,
+      weight: 1,
+      dashArray: '3 3',
+      opacity: opacity * 0.4
+    }).addTo(medaGroup);
+
+    dustHaze.bindTooltip(
+      `<div class="p-1 font-mono text-xs">
+        <strong class="text-amber-700">MEDA Atmospheric Optical Depth:</strong> τ = 0.44 ± 0.08<br/>
+        <span class="text-slate-500 text-[10px]">${MEDA_ATMOSPHERIC_DATA.dustDescription}</span>
+      </div>`,
+      { sticky: true }
+    );
+
+    // 2. Wind Flow Direction Vectors (NW -> SE down Neretva Vallis)
+    MEDA_ATMOSPHERIC_DATA.windVectors.forEach(vec => {
+      const line = L.polyline(vec.coords, {
+        color: '#0284C7',
+        weight: 3,
+        dashArray: '8 6',
+        opacity: opacity * 0.95
+      }).addTo(medaGroup);
+
+      line.bindTooltip(
+        `<div class="p-1 font-mono text-xs">
+          <strong class="text-sky-600">Prevailing Wind:</strong> NW → SE (~12 m/s)<br/>
+          <span class="text-slate-500 text-[10px]">${vec.name} (Katabatic flow down Neretva Vallis)</span>
+        </div>`,
+        { sticky: true }
+      );
+    });
+
+    // 3. Floating MEDA Telemetry Pill Marker on Map Canvas
+    const telemetryHtml = `
+      <div class="px-3 py-2 rounded-xl bg-slate-900/95 text-white border border-sky-400 shadow-xl font-mono text-[10px] backdrop-blur-md pointer-events-auto transform -translate-x-1/2 -translate-y-full transition-opacity duration-200" style="opacity: ${Math.min(1, opacity + 0.15)}">
+        <div class="flex items-center space-x-1.5 text-sky-300 font-bold border-b border-slate-700/80 pb-1 mb-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="tracking-wider">MEDA IN-SITU METEOROLOGY</span>
+        </div>
+        <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-[9.5px]">
+          <div>PRESSURE: <span class="text-amber-300 font-bold">725 Pa</span></div>
+          <div>WIND: <span class="text-sky-300 font-bold">12 m/s NW→SE</span></div>
+          <div>SURFACE TEMP: <span class="text-emerald-300 font-bold">-62° to -24°C</span></div>
+          <div>DUST OPACITY: <span class="text-amber-200 font-bold">τ = 0.44 ± 0.08</span></div>
+        </div>
+        <div class="mt-1.5 pt-1 border-t border-slate-800 text-[8.5px] text-slate-400 leading-tight">
+          Local point sensor telemetry @ Perseverance Station
+        </div>
+      </div>
+    `;
+
+    const medaMarkerIcon = L.divIcon({
+      html: telemetryHtml,
+      className: 'leaflet-meda-telemetry-badge',
+      iconSize: [260, 90],
+      iconAnchor: [130, 20]
+    });
+
+    L.marker([MEDA_ATMOSPHERIC_DATA.lat, MEDA_ATMOSPHERIC_DATA.lng], {
+      icon: medaMarkerIcon,
+      pane: 'routePane',
+      zIndexOffset: 800
+    }).addTo(medaGroup);
+
+  }, [layerOpacities.meda_atmos]);
 
   // Render Live Route Polyline and Directional Sequence Badges (1, 2, 3...)
   useEffect(() => {

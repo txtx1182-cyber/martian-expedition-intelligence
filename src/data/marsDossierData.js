@@ -619,6 +619,160 @@ export const SLOPE_HAZARD_ZONES = [
   }
 ];
 
+// THEMIS Day/Night Infrared Thermal Inertia Polygons
+export const THEMIS_THERMAL_INERTIA_ZONES = [
+  {
+    id: "themis-hi-delta-scarp",
+    name: "High Thermal Inertia: Western Delta Scarp & Cliff Retaining Outcrops",
+    type: "HIGH_INERTIA_BEDROCK",
+    inertiaValue: "420–510 J·m⁻²·K⁻¹·s⁻½",
+    color: "#EA580C", // Warm Amber/Terracotta
+    fillColor: "#EA580C",
+    description: "Exposed, indurated deltaic bedrock pavement and boulder lag deposits with minimal fine dust mantling.",
+    coords: [
+      [18.468, 77.348],
+      [18.498, 77.338],
+      [18.522, 77.368],
+      [18.508, 77.392],
+      [18.478, 77.382],
+      [18.462, 77.358]
+    ]
+  },
+  {
+    id: "themis-hi-seitah-ridge",
+    name: "High Thermal Inertia: Séítah Olivine Cumulate Ridge",
+    type: "HIGH_INERTIA_BEDROCK",
+    inertiaValue: "390–480 J·m⁻²·K⁻¹·s⁻½",
+    color: "#EA580C",
+    fillColor: "#EA580C",
+    description: "Coarse crystalline olivine cumulate bedrock; high thermal conductivity.",
+    coords: [
+      [18.418, 77.418],
+      [18.448, 77.432],
+      [18.458, 77.458],
+      [18.432, 77.462],
+      [18.412, 77.432]
+    ]
+  },
+  {
+    id: "themis-hi-west-rim",
+    name: "High Thermal Inertia: West Crater Rim Rocky Uplands",
+    type: "HIGH_INERTIA_BEDROCK",
+    inertiaValue: "450–550 J·m⁻²·K⁻¹·s⁻½",
+    color: "#EA580C",
+    fillColor: "#EA580C",
+    description: "Noachian megabreccia bedrock and impact ejecta blocks along the crater rim.",
+    coords: [
+      [18.350, 77.195],
+      [18.555, 77.205],
+      [18.535, 77.255],
+      [18.355, 77.245]
+    ]
+  },
+  {
+    id: "themis-hi-belva-rim",
+    name: "High Thermal Inertia: Belva Crater Impact Rim Escarpment",
+    type: "HIGH_INERTIA_BEDROCK",
+    inertiaValue: "410–490 J·m⁻²·K⁻¹·s⁻½",
+    color: "#EA580C",
+    fillColor: "#EA580C",
+    description: "Crater-rim ejecta and uplifted layered delta blocks.",
+    coords: [
+      [18.472, 77.338],
+      [18.502, 77.342],
+      [18.512, 77.378],
+      [18.488, 77.388],
+      [18.468, 77.368]
+    ]
+  },
+  {
+    id: "themis-lo-east-floor",
+    name: "Low Thermal Inertia: Eastern Crater Floor Eolian Dust Plain",
+    type: "LOW_INERTIA_DUST",
+    inertiaValue: "130–190 J·m⁻²·K⁻¹·s⁻½",
+    color: "#0284C7", // Cool Slate-Blue
+    fillColor: "#0284C7",
+    description: "Thick unconsolidated eolian dust mantles and high-porosity silt deposits.",
+    coords: [
+      [18.405, 77.465],
+      [18.515, 77.505],
+      [18.495, 77.605],
+      [18.375, 77.555]
+    ]
+  },
+  {
+    id: "themis-lo-north-basin",
+    name: "Low Thermal Inertia: North-Eastern Basin Sedimentary Wash",
+    type: "LOW_INERTIA_DUST",
+    inertiaValue: "140–210 J·m⁻²·K⁻¹·s⁻½",
+    color: "#0284C7",
+    fillColor: "#0284C7",
+    description: "Fine sediment accumulation with high diurnal surface temperature swing.",
+    coords: [
+      [18.495, 77.415],
+      [18.565, 77.445],
+      [18.545, 77.545],
+      [18.475, 77.495]
+    ]
+  }
+];
+
+// MEDA Atmospheric & In-Situ Surface Station Telemetry
+export const MEDA_ATMOSPHERIC_DATA = {
+  station: "Perseverance Rover MEDA Instrument Suite",
+  location: "Jezero Crater Floor (Octavia E. Butler Landing / Traverse)",
+  lat: 18.475,
+  lng: 77.445,
+  pressurePa: 725,
+  pressureUncertainty: "± 5 Pa",
+  tempRangeC: "-62°C to -24°C",
+  windSpeedMs: 12.0,
+  windDirection: "NW → SE",
+  windDescription: "Valley katabatic flow down Neretva Vallis into Jezero Basin",
+  opticalDepthTau: "0.44 ± 0.08",
+  dustDescription: "Moderate background Martian atmospheric dust optical depth",
+  honestyNote: "MEDA measures local point conditions at Perseverance; shown with uncertainty — not a regional weather forecast",
+  windVectors: [
+    {
+      id: "wv-1",
+      name: "Neretva Channel Axial Inflow",
+      coords: [
+        [18.530, 77.240],
+        [18.510, 77.285],
+        [18.495, 77.335],
+        [18.475, 77.390],
+        [18.450, 77.450]
+      ]
+    },
+    {
+      id: "wv-2",
+      name: "Delta Flank Katabatic Stream",
+      coords: [
+        [18.515, 77.260],
+        [18.495, 77.305],
+        [18.480, 77.355],
+        [18.460, 77.410],
+        [18.435, 77.470]
+      ]
+    },
+    {
+      id: "wv-3",
+      name: "North Delta Scarp Deflection",
+      coords: [
+        [18.545, 77.270],
+        [18.525, 77.320],
+        [18.505, 77.375],
+        [18.485, 77.435],
+        [18.460, 77.500]
+      ]
+    }
+  ],
+  dustHazeBounds: [
+    [18.32, 77.16],
+    [18.62, 77.62]
+  ]
+};
+
 // Exact Mars Haversine Distance Calculator (Meters)
 // d = 2 * R * asin(sqrt(sin²(Δlat/2) + cos(lat1)*cos(lat2)*sin²(Δlon/2)))
 // Mars Volumetric Mean Radius R = 3,389,500 m

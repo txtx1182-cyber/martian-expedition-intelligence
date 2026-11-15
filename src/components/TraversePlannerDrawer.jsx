@@ -18,7 +18,8 @@ import {
   Zap,
   CheckCircle2,
   Eye,
-  EyeOff
+  EyeOff,
+  AlertTriangle
 } from 'lucide-react';
 import { 
   NASA_TILE_LAYERS, 
@@ -86,6 +87,24 @@ export default function TraversePlannerDrawer({
       specs: '16k Global + HiRISE | TMS: true | native zoom ≤ 5',
       tag: 'HiRISE Zoom Ready',
       defaultVal: 1.0
+    },
+    {
+      id: 'themis_ir',
+      modeKey: 'FREE_BLEND',
+      title: '5. Thermal Infrared Inertia',
+      specs: 'THEMIS Day/Night IR | 100 m/px',
+      tag: 'Thermal Inertia',
+      defaultVal: 0.70,
+      guardrailNote: 'Native resolution ~100 m/px — regional thermal context only; do not infer boulder-scale safety'
+    },
+    {
+      id: 'meda_atmos',
+      modeKey: 'FREE_BLEND',
+      title: '6. Atmospheric & Dust Context',
+      specs: 'MEDA Point Series | Jezero Station',
+      tag: 'In-Situ Weather',
+      defaultVal: 0.85,
+      guardrailNote: 'MEDA measures local point conditions at Perseverance; shown with uncertainty — not a regional weather forecast'
     }
   ];
 
@@ -672,6 +691,14 @@ export default function TraversePlannerDrawer({
                         <span className="text-[9px] font-mono text-slate-400 select-none">100%</span>
                       </div>
                     </div>
+
+                    {/* Scientific Guardrail Note */}
+                    {layer.guardrailNote && (
+                      <div className="mt-2 p-1.5 rounded bg-amber-50/90 border border-amber-200 text-[9.5px] font-mono text-amber-900 leading-tight flex items-start space-x-1.5">
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
+                        <span><strong>NOTE:</strong> {layer.guardrailNote}</span>
+                      </div>
+                    )}
                   </div>
                 );
               })}
