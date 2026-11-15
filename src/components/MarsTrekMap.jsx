@@ -334,7 +334,7 @@ export default function MarsTrekMap({
 
   // Manage Zoom-Triggered HiRISE Overlay Fades
   useEffect(() => {
-    const isCelestiaActive = activeMapMode === 'CELESTIA';
+    const isCelestiaActive = activeMapMode === 'CELESTIA' || (layerOpacities && layerOpacities.celestia_shaded > 0.05);
     const tier1 = tier1OverlayRef.current;
     const tier2 = tier2OverlayRef.current;
 
@@ -350,7 +350,7 @@ export default function MarsTrekMap({
       tier1.setOpacity(0.20);
       tier2.setOpacity(0.98);
     }
-  }, [activeMapMode, currentZoom]);
+  }, [activeMapMode, layerOpacities, currentZoom]);
 
   // Render Live Route Polyline and Directional Sequence Badges (1, 2, 3...)
   useEffect(() => {

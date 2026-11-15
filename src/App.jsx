@@ -11,14 +11,14 @@ import { VERIFIED_TARGETS, PRESET_SORTIES } from './data/marsDossierData';
 export default function App() {
   // Planetary Map Modes:
   // 'OPTICAL', 'MOLA_ELEVATION', 'MOLA_GRAY', 'CELESTIA', 'FREE_BLEND'
-  const [activeMapMode, setActiveMapMode] = useState('OPTICAL');
+  const [activeMapMode, setActiveMapMode] = useState('FREE_BLEND');
 
   // Tile Layer Opacities
   const [layerOpacities, setLayerOpacities] = useState({
     mars_optical: 1.0,
-    mola_color: 0.65,
-    mola_gray: 0.50,
-    celestia_shaded: 0.40
+    mola_color: 0.0,
+    mola_gray: 0.0,
+    celestia_shaded: 0.0
   });
 
   // Active Target ID (Default to T7 Bright Angel / Cheyava Falls)

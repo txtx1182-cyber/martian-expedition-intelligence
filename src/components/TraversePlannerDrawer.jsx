@@ -16,7 +16,9 @@ import {
   Clock,
   ShieldCheck,
   Zap,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { 
   NASA_TILE_LAYERS, 
@@ -51,6 +53,80 @@ export default function TraversePlannerDrawer({
   onSelectTarget
 }) {
   const activeSortie = PRESET_SORTIES.find(s => s.id === activeSortieId) || PRESET_SORTIES[0];
+
+  const LAYER_CARDS = [
+    {
+      id: 'mars_optical',
+      modeKey: 'OPTICAL',
+      title: '1. Mars Optical Satellite',
+      specs: 'Viking MDIM 2.1 | XYZ | native zoom ≤ 8',
+      tag: 'Natural Color',
+      defaultVal: 1.0
+    },
+    {
+      id: 'mola_color',
+      modeKey: 'MOLA_ELEVATION',
+      title: '2. MOLA Colorized Elevation',
+      specs: 'Laser Altimeter | TMS: true | native zoom ≤ 6',
+      tag: 'Hypsometric',
+      defaultVal: 0.85
+    },
+    {
+      id: 'mola_gray',
+      modeKey: 'MOLA_GRAY',
+      title: '3. MOLA Shaded Relief',
+      specs: 'Hillshade | TMS: true | native zoom ≤ 6',
+      tag: 'Hillshade',
+      defaultVal: 0.80
+    },
+    {
+      id: 'celestia_shaded',
+      modeKey: 'CELESTIA',
+      title: '4. Celestia 16k True-Color + HiRISE Zoom Overlays',
+      specs: '16k Global + HiRISE | TMS: true | native zoom ≤ 5',
+      tag: 'HiRISE Zoom Ready',
+      defaultVal: 1.0
+    }
+  ];
+
+  const handleSoloLayer = (layerId) => {
+    LAYER_CARDS.forEach(layer => {
+      onOpacityChange(layer.id, layer.id === layerId ? 1.0 : 0.0);
+    });
+    if (onSelectMapMode) {
+      onSelectMapMode('FREE_BLEND');
+    }
+  };
+
+  const handleToggleVisibility = (layerId) => {
+    const currentVal = layerOpacities[layerId] ?? 0;
+    if (currentVal > 0) {
+      onOpacityChange(layerId, 0.0);
+    } else {
+      const def = LAYER_CARDS.find(l => l.id === layerId)?.defaultVal || 1.0;
+      onOpacityChange(layerId, def);
+    }
+    if (onSelectMapMode) {
+      onSelectMapMode('FREE_BLEND');
+    }
+  };
+
+  const handleSliderChange = (layerId, percent) => {
+    onOpacityChange(layerId, Math.max(0, Math.min(100, percent)) / 100);
+    if (onSelectMapMode) {
+      onSelectMapMode('FREE_BLEND');
+    }
+  };
+
+  const isSoloLayer = (layerId) => {
+    const thisVal = Math.round((layerOpacities[layerId] ?? 0) * 100);
+    if (thisVal < 95) return false;
+    return LAYER_CARDS.every(l => {
+      if (l.id === layerId) return true;
+      const otherVal = Math.round((layerOpacities[l.id] ?? 0) * 100);
+      return otherVal === 0;
+    });
+  };
 
   // Calculate live route metrics from activeRoutePoints
   let totalDistMeters = 0;
@@ -478,77 +554,133 @@ export default function TraversePlannerDrawer({
         )}
 
         {/* ======================================================== */}
-        {/* TAB 3: BASEMAP & OPACITY SLIDERS                         */}
+        {/* TAB 3: UNIFIED MULTI-LAYER CARD STACK                    */}
         {/* ======================================================== */}
         {activeTab === 'LAYERS' && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div>
               <span className="text-xs font-display font-bold uppercase tracking-wider text-slate-800 flex items-center space-x-1.5 mb-1">
                 <Layers className="w-4 h-4 text-terracotta-700" />
                 <span>Planetary Basemaps & Blending</span>
               </span>
               <p className="text-[11px] text-slate-600 font-sans leading-relaxed">
-                Switch basemaps or smoothly blend multi-spectral orbital datasets.
+                Click <strong>Solo</strong> (or card title) for instant 1-click basemap switching, or drag inline sliders to blend multi-spectral orbital datasets simultaneously.
               </p>
             </div>
 
-            {/* Basemap Mode Selector */}
+            {/* Unified 4-Layer Card Stack */}
             <div className="space-y-2">
-              <span className="text-[11px] font-mono font-bold text-slate-700">Select Active Basemap:</span>
-              <div className="grid grid-cols-1 gap-1.5">
-                {[
-                  { id: 'OPTICAL', name: '1. Mars Optical Mosaic (Viking MDIM)', tag: 'Natural Color' },
-                  { id: 'MOLA_ELEVATION', name: '2. MOLA Colorized Elevation', tag: 'Hypsometric' },
-                  { id: 'MOLA_GRAY', name: '3. MOLA Grayscale Shaded Relief', tag: 'Hillshade' },
-                  { id: 'CELESTIA', name: '4. Celestia 16k True Color', tag: 'HiRISE Zoom Ready' }
-                ].map(mode => (
-                  <button
-                    key={mode.id}
-                    onClick={() => onSelectMapMode(mode.id)}
-                    className={`p-2 rounded-lg border text-left transition-colors ${
-                      activeMapMode === mode.id
-                        ? 'border-terracotta-700 bg-terracotta-50 text-terracotta-900 font-bold shadow-subtle'
-                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+              {LAYER_CARDS.map(layer => {
+                const currentVal = layerOpacities[layer.id] ?? 0;
+                const opacityPct = Math.round(currentVal * 100);
+                const isActive = opacityPct > 0;
+                const isSolo = isSoloLayer(layer.id);
+
+                return (
+                  <div
+                    key={layer.id}
+                    className={`p-3 rounded-xl border transition-all duration-200 ${
+                      isActive
+                        ? 'border-terracotta-500 bg-[#FFF7ED]/70 shadow-xs ring-1 ring-terracotta-500/20'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-display">{mode.name}</span>
-                      <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-slate-100 text-slate-600 border border-slate-300">
-                        {mode.tag}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
+                    {/* Top Row: Eye toggle, Name, Specs, Solo button, and Live Percentage Badge */}
+                    <div className="flex items-start justify-between gap-1.5 mb-2">
+                      <div className="flex items-start space-x-2 min-w-0">
+                        {/* Eye Visibility Toggle */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleVisibility(layer.id);
+                          }}
+                          className={`mt-0.5 p-1 rounded-md transition-colors shrink-0 ${
+                            isActive
+                              ? 'text-terracotta-700 bg-terracotta-100 hover:bg-terracotta-200'
+                              : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                          }`}
+                          title={isActive ? 'Hide Layer (0%)' : 'Show Layer (100%)'}
+                        >
+                          {isActive ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                        </button>
 
-            {/* Tile Layer Opacity Sliders */}
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
-              <span className="text-xs font-display font-bold uppercase tracking-wider text-slate-800 flex items-center space-x-1.5">
-                <Sliders className="w-4 h-4 text-terracotta-700" />
-                <span>Multi-Domain Opacities</span>
-              </span>
+                        {/* Title & Technical Specs (Clicking header also solos layer) */}
+                        <div
+                          onClick={() => handleSoloLayer(layer.id)}
+                          className="cursor-pointer group select-none min-w-0"
+                          title="Click to Solo / Focus this layer"
+                        >
+                          <h4 className="text-xs font-display font-bold text-slate-900 group-hover:text-terracotta-700 transition-colors truncate">
+                            {layer.title}
+                          </h4>
+                          <div className="text-[10px] font-mono text-slate-500 mt-0.5 truncate">
+                            {layer.specs}
+                          </div>
+                        </div>
+                      </div>
 
-              {NASA_TILE_LAYERS.map(layer => {
-                const currentVal = layerOpacities[layer.id] ?? layer.defaultOpacity;
-                return (
-                  <div key={layer.id} className="space-y-1">
-                    <div className="flex items-center justify-between text-[11px] font-mono">
-                      <span className="text-slate-800 font-medium">{layer.shortName}</span>
-                      <span className="text-terracotta-700 font-bold">{Math.round(currentVal * 100)}%</span>
+                      {/* Right: Live Percentage & Solo Button */}
+                      <div className="flex items-center space-x-1.5 shrink-0 ml-1">
+                        <span
+                          className={`text-[11px] font-mono font-bold px-1.5 py-0.5 rounded border ${
+                            isActive
+                              ? 'bg-terracotta-100 text-terracotta-800 border-terracotta-300'
+                              : 'bg-slate-100 text-slate-400 border-slate-200'
+                          }`}
+                        >
+                          {opacityPct}%
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSoloLayer(layer.id);
+                          }}
+                          className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-all border ${
+                            isSolo
+                              ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                              : 'bg-white text-slate-600 border-slate-300 hover:border-terracotta-600 hover:text-terracotta-700'
+                          }`}
+                          title={`Solo ${layer.title} (sets to 100% and turns off others)`}
+                        >
+                          {isSolo ? 'Soloed' : 'Solo'}
+                        </button>
+                      </div>
                     </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.05"
-                      value={currentVal}
-                      onChange={(e) => onOpacityChange(layer.id, parseFloat(e.target.value))}
-                      className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-terracotta-700"
-                    />
+
+                    {/* Bottom Row: Inline Terracotta Opacity Slider */}
+                    <div className="pt-2 border-t border-slate-200/80">
+                      <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 mb-1">
+                        <span className="font-semibold text-slate-600">BLEND OPACITY</span>
+                        <span className={`font-bold ${isActive ? 'text-terracotta-700' : 'text-slate-400'}`}>
+                          {opacityPct}%
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-[9px] font-mono text-slate-400 select-none">0%</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          step="1"
+                          value={opacityPct}
+                          onChange={(e) => handleSliderChange(layer.id, parseInt(e.target.value, 10))}
+                          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#C2410C]"
+                        />
+                        <span className="text-[9px] font-mono text-slate-400 select-none">100%</span>
+                      </div>
+                    </div>
                   </div>
                 );
               })}
+            </div>
+
+            {/* Scientific Guidance Badge */}
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-[10px] font-mono text-slate-600 leading-relaxed">
+              <span className="font-bold text-slate-800 block mb-0.5">💡 MULTI-SPECTRAL BLEND:</span>
+              Stack <strong>MOLA Color</strong> (40%–60%) over <strong>Mars Optical</strong> (100%) for colored hypsometric topography, or use <strong>Celestia</strong> (100%) for auto-fading HiRISE zoom photography.
             </div>
           </div>
         )}
