@@ -1,92 +1,100 @@
+@import 'leaflet/dist/leaflet.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    background-color: #070B14;
-    color: #F8FAFC;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #F8F9FA;
+    color: #0F172A;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
   }
 }
 
-/* Custom Tactical Scrollbars */
+/* Light Mode Precision Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B1120;
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
-  border-radius: 3px;
+  background: #CBD5E1;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #94A3B8;
 }
 
-/* HUD Scanline & Grid Effect */
-.bg-tactical-grid {
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 24px 24px;
+/* Leaflet Container and Customization */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: #E2E8F0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  outline: none;
 }
 
-.bg-dot-matrix {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 16px 16px;
+/* Clean up Leaflet Attribution for editorial light UI */
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(4px);
+  color: #64748B !important;
+  font-size: 10px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  margin: 8px !important;
 }
 
-/* Glassmorphism Classes */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.leaflet-control-attribution a {
+  color: #1D4ED8 !important;
+  text-decoration: none;
 }
 
-.glass-panel-elevated {
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6);
+/* Clean Leaflet Zoom Controls */
+.leaflet-bar {
+  border: 1px solid #CBD5E1 !important;
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
 }
 
-.hud-panel {
-  background: rgba(7, 11, 20, 0.92);
-  border: 1px solid rgba(6, 182, 212, 0.3);
-  box-shadow: 0 0 15px rgba(6, 182, 212, 0.1);
+.leaflet-bar a {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
 }
 
-.hud-border-glow {
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.35);
+.leaflet-bar a:hover {
+  background-color: #F8FAFC !important;
+  color: #C2410C !important;
 }
 
-.hazard-glow-crimson {
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+/* Custom Marker Pin Animation */
+@keyframes marker-pulse {
+  0% { transform: scale(0.95); opacity: 0.9; }
+  50% { transform: scale(1.35); opacity: 0.3; }
+  100% { transform: scale(0.95); opacity: 0.9; }
 }
 
-.hazard-glow-amber {
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+.marker-halo-pulse {
+  animation: marker-pulse 2s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
 }
 
-.hazard-glow-emerald {
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
-}
-
-/* Pulsing rings */
-@keyframes pulse-ring {
-  0% { transform: scale(0.95); opacity: 0.8; }
-  50% { transform: scale(1.35); opacity: 0; }
-  100% { transform: scale(0.95); opacity: 0.8; }
-}
-
-.animate-pulse-ring {
-  animation: pulse-ring 2.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+/* Range input styling for opacity sliders */
+input[type=range] {
+  accent-color: #C2410C;
 }

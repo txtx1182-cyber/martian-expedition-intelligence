@@ -1,177 +1,112 @@
 # MISSION 001: MARTIAN EXPEDITION INTELLIGENCE
-### Hyperlocal Tactical Surface Exploration & Biosignature Intelligence System
+### Editorial-Grade Planetary Science & Astronaut EVA Planning Platform
 **NASA Space Apps Challenge 2026 — Challenge 11: Interplanetary Survival Guide: Martian Map**
 
-![NASA Space Apps 2026](https://img.shields.io/badge/NASA%20Space%20Apps-2026-EF4444?style=for-the-badge&logo=nasa)
-![React 18](https://img.shields.io/badge/React-18.3.1-06B6D4?style=for-the-badge&logo=react)
-![Vite](https://img.shields.io/badge/Vite-5.4-8B5CF6?style=for-the-badge&logo=vite)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38BDF8?style=for-the-badge&logo=tailwindcss)
+![NASA Space Apps 2026](https://img.shields.io/badge/NASA%20Space%20Apps-2026-C2410C?style=for-the-badge&logo=nasa)
+![React 18](https://img.shields.io/badge/React-18.3.1-1D4ED8?style=for-the-badge&logo=react)
+![Leaflet](https://img.shields.io/badge/Leaflet-1.9.4-047857?style=for-the-badge&logo=leaflet)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-0F172A?style=for-the-badge&logo=tailwindcss)
 ![Build Status](https://img.shields.io/badge/Build-Passing-10B981?style=for-the-badge)
 
 ---
 
-## 1. Project Overview
+## 1. Overview & Editorial Design Philosophy
 
-**MISSION 001: MARTIAN EXPEDITION INTELLIGENCE** is a dual-mode, hyperlocal tactical surface navigation and scientific analysis application engineered for human-robot Mars surface expeditions in **Neretva Vallis & Bright Angel (Jezero Crater, Mars: `18.44° N, 77.40° E`)**. 
+**MISSION 001: MARTIAN EXPEDITION INTELLIGENCE** is an editorial-grade, light-mode planetary science and astronaut surface exploration platform developed for **NASA Space Apps Challenge 2026 (Challenge 11)**.
 
-It is tailored for a two-astronaut surface exploration team (**EVA-1 Lead Geologist Dr. Maya Chen** and **EVA-2 Safety Specialist Leo Vance**) operating in tandem with an autonomous robotic tool-carrier mule (**MARS-CARRIER-01**).
-
-### Zero External API Key & Resilient Architecture
-- **Self-Contained Vector & Canvas Engine:** Built with 100% bespoke SVG and Canvas rendering equations.
-- **Zero External Map Tile API Keys:** No Mapbox, Google Maps, or external tile services required.
-- **Zero Raw PDS `.IMG` Parsing Bottlenecks:** NASA instrument data (HiRISE, CRISM, PIXL, SHERLOC, MEDA, RAD) are pre-mapped into geometric vectors and telemetry models.
-- **Production-Ready:** Compiles with zero errors directly to `dist/` and deploys seamlessly as a static site on **Render** or **GitHub Pages**.
-
----
-
-## 2. Dual-Mode Interface Architecture
+Rejecting generic "sci-fi neon AI slop", the application adheres to high-craft Swiss cartographic principles, USGS Geological Survey standards, and NASA JPL Eyes design systems:
+- **Canvas:** Warm alabaster (`#F8F9FA`) with pure white inspector panels (`#FFFFFF`) and 1px crisp borders (`#CBD5E1`).
+- **Typography:** Google Fonts **`Space Grotesk`** (editorial headings), **`Plus Jakarta Sans`** (clean scientific body text), and **`JetBrains Mono`** (strictly for coordinates, elevation heights, DOIs, and rover telemetry).
+- **Cartographic Engine:** Real **Leaflet.js** engine streaming live **NASA JPL Mars Trek WMTS XYZ tiles** centered on **Jezero Crater, Mars (`18.444° N, 77.401° E`, zoom `13`)**.
 
 ```
-                                 ┌──────────────────────────────────────────────────────────┐
-                                 │       MISSION 001: MARTIAN EXPEDITION INTELLIGENCE       │
-                                 └────────────────────────────┬─────────────────────────────┘
-                                                              │
-                                ┌─────────────────────────────┴────────────────────────────┐
-                                │                                                          │
-                 ▼                                                          ▼
-  ┌──────────────────────────────┐                           ┌──────────────────────────────┐
-  │   HABITAT PLANNING CONSOLE   │                           │     EVA VISOR / WRIST-PAD    │
-  ├──────────────────────────────┤                           ├──────────────────────────────┤
-  │ • 5 Toggleable NASA Layers   │                           │ • High-Contrast Helmet HUD   │
-  │ • Route Trade-Off Matrix     │                           │ • Dynamic Walk-Back Timer    │
-  │ • Scientific Rigor Panel     │                           │ • Live Slope Angle Alerts    │
-  │ • Instrument Provenance      │                           │ • Eye-Level Outcrop POV      │
-  │ • Peer-Reviewed Citations    │                           │ • Crew Bio-Telemetry (O2/p)  │
-  └──────────────────────────────┘                           └──────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                      MISSION 001: MARTIAN EXPEDITION INTELLIGENCE                       │
+├─────────────────────────┬──────────────────────────────────┬───────────────────────────┤
+│ LAYER & CORRIDOR DRAWER │ REAL NASA MARS TREK LEAFLET MAP  │ TARGET INTELLIGENCE       │
+│ (320px)                 │ (Center Full Viewport)           │ (420px Slide-Over)        │
+│ • 4 Live NASA WMTS      │ • Viking Color Mosaic (232m)     │ • 4 Separated Scores      │
+│   Tile Opacity Sliders  │ • Jezero CTX / HiRISE (6m)       │ • Epistemological Badges  │
+│ • Research Corridor     │ • THEMIS Day IR Thermal Inertia  │ • DOI Citations           │
+│ • RAD / MEDA Telemetry  │ • MOLA Topographic DEM Shading   │ • Astrobiology Rigor      │
+│ • Simulate SEP Storm    │ • 5 Dossier Target Pins + Path   │ • Astronaut EVA Consumable│
+└─────────────────────────┴──────────────────────────────────┴───────────────────────────┘
 ```
 
-1. **Habitat Planning Console Mode:** Full scientific analysis and route strategy cockpit. Flight controllers and scientists can toggle 5 NASA instrument layers, evaluate trade-offs between Route A and Route B, inspect peer-reviewed citations, and evaluate candidate biosignatures.
-2. **EVA Visor / Wrist-Pad Mode:** High-contrast, low-cognitive-load heads-up display (HUD) for astronauts in pressurized EVA suits. Highlights dynamic walk-back safety timer, slope angle stability warnings, real-time life support telemetry (O2, battery, suit pressure 29.6 kPa), and ground-level target landmark recognition.
+---
+
+## 2. Real NASA Mars Trek Satellite Tile Engine
+
+The map streams real live WMTS XYZ satellite imagery directly from **NASA JPL Mars Trek** with dynamic opacity blending:
+
+1. **Optical Layer (Viking Color Mosaic):**
+   `https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0//default/default028mm/{z}/{y}/{x}.jpg`
+2. **High-Res Jezero Crater CTX Overlay (6m):**
+   `https://trek.nasa.gov/tiles/Mars/EQ/Jezerocrater_CTX_Mosaic_6m/1.0.0//default/default028mm/{z}/{y}/{x}.png`
+3. **Thermal Infrared Layer (THEMIS Day IR):**
+   `https://trek.nasa.gov/tiles/Mars/EQ/Mars_THEMIS_IR_Day_Mosaic_global_100m/1.0.0//default/default028mm/{z}/{y}/{x}.jpg`
+4. **Topographic Elevation Layer (MOLA Colorized Hillshade):**
+   `https://trek.nasa.gov/tiles/Mars/EQ/Mars_MOLA_blend200ppx_HRSC_Shade_clon0dd_200mpp_lzw/1.0.0//default/default028mm/{z}/{y}/{x}.jpg`
+5. **Radiation & Environmental Layer (RAD / MEDA):**
+   GCR background (`0.64 mSv/day`), pressure (`725 Pa`), wind vector (`12 m/s NW`), dust opacity (`τ = 0.44`), and an interactive **"Simulate SEP Alert"** trigger highlighting terrain-shielded sites.
 
 ---
 
-## 3. Hyperlocal 1.5 km × 1.5 km Tactical Map
+## 3. Master Scientific Research Dossier (5 Verified Targets)
 
-The interactive tactical map renders an accurate 1.5 km × 1.5 km footprint across **Neretva Vallis** and **Bright Angel** (`18.432° N–18.452° N, 77.385° E–77.415° E`):
-- **Dynamic Scale Bar (`0–500 m`):** Accurately scales with zoom level.
-- **Pan & Zoom Controls:** Mouse drag, pinch, wheel zoom (75%–400%), and reset view.
-- **5 Toggleable NASA Instrument Layers:**
-  1. **Optical & Morphological Layer (HiRISE):** Paleo-fluvial channel banks, bedrock fracture systems, ripple dunes, and crater floor contact.
-  2. **Topographic & Spacesuit Mobility Layer (HiRISE DEM):** Elevation contours (`-2540 m` to `-2505 m`) with spacesuit slope risk coding:
-     - 🟢 **Safe (`< 10°`, Emerald):** Normal bipedal locomotion.
-     - 🟡 **Caution (`10°–15°`, Amber):** Center-of-gravity strain; deploy robotic mule as stabilizer.
-     - 🔴 **No-Go Scarp (`> 15°`, Crimson):** Impassable cliff faces and boulder fields avoided by planning.
-  3. **Spectral & Mineralogical Layer (CRISM + PIXL):** Spatial distribution of olivine/pyroxene igneous basement (`Séítah/Máaz`), smectite clays (`Bright Angel`), marginal carbonates, and iron-phosphate/iron-sulfide redox facies (`Cheyava Falls`).
-  4. **Atmospheric & Dust Layer (MEDA):** Dynamic wind vector streamlines (`12.4 m/s NW`), ambient temperature (`-48.2°C`), pressure (`725 Pa`), and dust optical depth (`τ = 0.44`).
-  5. **Space Weather & Radiation Layer (RAD / MAVEN):** Real-time Galactic Cosmic Ray (GCR) baseline (`0.64 mSv/day`) with an interactive **"Simulate SEP Alert"** button triggering an emergency radiation warning, countdown to peak proton arrival, and escape navigation to the nearest terrain shielding alcove.
-
----
-
-## 4. Traverse Routes & Verified Waypoints
-
-### Selectable Routes
-- **Route A — Primary Science Traverse (`1.65 km` | `3h 40m` | Max Slope `12.0°`):**
-  - Visits all 5 scientific targets, optimizing astrobiology sample caching while skirting `>15°` scarps.
-- **Route B — Safe Low-Slope Contingency Route (`1.20 km` | `2h 30m` | Max Slope `7.2°`):**
-  - Stays strictly on flat channel-floor alluvium for rapid crew walk-back safety (`28 min` to Hab).
-
-### 5 Verified Waypoints
-| Waypoint | Coordinates | Elevation | Geological Unit & Key Significance | Suit Access |
+| Target | Coordinates & Elevation | Geological Formation | Primary Literature Reference | 4 Separated Scores |
 |---|---|---|---|---|
-| **WP-01: Habitat Airlock** | `18.438° N, 77.392° E` | -2540 m | Séítah / Máaz Igneous contact baseline *(Farley et al., 2022)* | 98 / 100 (Safe) |
-| **WP-02: Neretva Rim** | `18.441° N, 77.396° E` | -2532 m | Fluvial flood boulder conglomerate *(Mangold et al., 2021)*; Emergency SEP overhang shelter | 78 / 100 (Safe) |
-| **WP-03: Bright Angel** | `18.444° N, 77.401° E` | -2525 m | Fine-grained laminated lacustrine mudstone with smectite clays *(Hurowitz et al., 2025)* | 85 / 100 (Safe) |
-| **WP-04: Cheyava Falls** | `18.446° N, 77.404° E` | -2521 m | **Primary Astrobiological Target:** Vivianite/greigite redox reaction halos & organic carbon *(Hurowitz et al., 2025)* | 74 / 100 (Caution 11.2°) |
-| **WP-05: Carbonate Ridge** | `18.449° N, 77.407° E` | -2508 m | Paleolake shoreline carbonate unit *(Farley et al., 2020)*; adjacent to 18.5° no-go scarp | 52 / 100 (Caution 14.8°) |
+| **Target 01: Crater-Floor Igneous Formations** | `18.428° N, 77.451° E` (-2565 m) | Séítah & Máaz Igneous Basement | Farley et al. (2022), *Science* [DOI: 10.1126/science.abo2196](https://doi.org/10.1126/science.abo2196) | Hab: 48 \| Bio: 18 \| Sci: 82 \| Suit: 92 (Safe &lt;5°) |
+| **Target 02: Western Delta & Delta-Front Deposits** | `18.452° N, 77.422° E` (-2528 m) | Kodiak-Equivalent Delta Megaclasts | Mangold et al. (2021), *Science* [DOI: 10.1126/science.abl4051](https://doi.org/10.1126/science.abl4051) | Hab: 76 \| Bio: 35 \| Sci: 88 \| Suit: 64 (Caution 13°) |
+| **Target 03: Delta Fine-Grained Sedimentary Layers** | `18.458° N, 77.409° E` (-2510 m) | Lacustrine Mudstones (Smectite Clays) | Mangold et al. (2021) & Farley et al. (2020) [DOI: 10.1007/s11214-020-00762-y](https://doi.org/10.1007/s11214-020-00762-y) | Hab: 86 \| Bio: 58 \| Sci: 90 \| Suit: 76 (Safe 7°) |
+| **Target 04: Neretva Vallis & Bright Angel (Cheyava Falls)** | `18.444° N, 77.401° E` (-2521 m) | Veined Mudstones, Vivianite Fe-PO₄ & Greigite Fe-S | Hurowitz et al. (2025), *Nature* Vol. 645 [DOI: 10.1038/s41586-025-09413-0](https://doi.org/10.1038/s41586-025-09413-0) | Hab: 92 \| Bio: 86 \| Sci: 98 \| Suit: 84 (Caution 11°) |
+| **Target 05: Carbonate-Bearing Margin Unit** | `18.465° N, 77.388° E` (-2485 m) | Hydrated Shoreline Carbonates & Chert | Farley et al. (2020), *Space Sci. Rev.* [DOI: 10.1007/s11214-020-00762-y](https://doi.org/10.1007/s11214-020-00762-y) | Hab: 85 \| Bio: 54 \| Sci: 94 \| Suit: 51 (Warning 18°) |
 
 ---
 
-## 5. Astrobiological Rigor Panel (Cheyava Falls / WP-04)
+## 4. Epistemological Traceability & Astrobiological Rigor
 
-In accordance with strict NASA scientific reporting standards, the application clearly labels candidate biosignatures:
+In strict compliance with NASA scientific integrity directives:
 
-> **STATUS: "POTENTIAL BIOSIGNATURE — NOT CONFIRMED LIFE"**
+### Target 04 Official Classification
+> **"POTENTIAL BIOSIGNATURE — NOT CONFIRMED EVIDENCE OF LIFE"**
 
-The panel clearly demarcates:
-1. **Direct Observations (Empirical Data):**
-   - Deep-UV Raman spectroscopy: G-band aromatic carbon detection (~1600 cm⁻¹).
-   - PIXL micro-XRF mapping: Millimeter halos with Fe-depleted, P-enriched cores (vivianite-type) ringed by Fe-S (greigite-type).
-   - Calcium sulfate (gypsum/anhydrite) cross-cutting veins demonstrating sub-boiling fluid circulation.
-2. **Biotic Hypothesis:** Ancient microbial iron- and sulfate-reducing metabolism utilizing organic matter as an electron donor.
-3. **Competing Abiotic Explanations:**
-   - Low-temperature diagenetic fluid mixing (acidic iron-bearing fluids encountering alkaline pore waters).
-   - Fischer-Tropsch-type (FTT) organic synthesis catalyzed by iron-nickel basement minerals.
-   - Radiolytic organic alteration driven by trace actinides in detrital heavy minerals.
+Each target in the **Target Intelligence Drawer** decomposes evidence into 4 distinct epistemological categories:
+1. `DIRECT OBSERVATION`: Empirical data from rover instruments (SHERLOC deep-UV Raman, PIXL micro-XRF, SuperCam RMI, Mastcam-Z).
+2. `PUBLISHED INTERPRETATION`: Peer-reviewed deductions with clickable direct DOI hyperlinks.
+3. `RESEARCH HYPOTHESIS`: Working models of ancient Jezero paleo-environments.
+4. `COMPETING ABIOTIC EXPLANATION`: Rigorous non-biological alternatives (e.g. low-temperature diagenetic fluid mixing, Fischer-Tropsch-type synthesis, or radiolytic organic alteration).
 
 ---
 
-## 6. First-Person POV Landmark Viewer
+## 5. Astronaut Marswalk (EVA) Operational Intelligence
 
-Clicking any waypoint loads a simulated **Mastcam-Z / Navcam Eye-Level Outcrop Profile**:
-- **10 cm Reference Scale Bar** for in-situ field measurement.
-- **Interactive Mineral Callout Pins:** Olivine phenocrysts, smectite layers, calcium sulfate veins, and millimetric "leopard spot" redox centers.
-- **Drill Abrasion Targets:** Simulated 10 mm core extraction zones for sample tube caching.
-
----
-
-## 7. Peer-Reviewed Scientific References
-
-1. **Hurowitz, J. A., Tice, M. M., Allwood, A. C., et al. (2025).** *Aqueous alteration, redox chemistry, and potential biosignatures at Bright Angel, Jezero Crater.* **Nature Geoscience**. [DOI: 10.1038/s41561-025-01640-x](https://doi.org/10.1038/s41561-025-01640-x)
-2. **Farley, K. A., Stack, K. M., Shuster, D. L., et al. (2022).** *Aqueously altered igneous rocks on the floor of Jezero crater, Mars.* **Science**, 377(6614). [DOI: 10.1126/science.abo2196](https://doi.org/10.1126/science.abo2196)
-3. **Mangold, N., Gupta, S., Armstrong, O., et al. (2021).** *Perseverance rover reveals an ancient delta-lake system and flood deposits at Jezero crater, Mars.* **Science**, 374(6568), 711–717. [DOI: 10.1126/science.abl4051](https://doi.org/10.1126/science.abl4051)
-4. **Farley, K. A., Williford, K. H., Stack, K. M., et al. (2020).** *Mars 2020 Mission Overview: Astrobiology, Sample Caching, and Jezero Crater Landing Site.* **Space Science Reviews**, 216(8), 142. [DOI: 10.1007/s11214-020-00762-8](https://doi.org/10.1007/s11214-020-00762-8)
+Switch between **Habitat Science Mode** and **Astronaut EVA Wrist-Pad Mode**:
+- Distance from **Habitat Alpha Station** (`18.435° N, 77.435° E`).
+- Dynamic walk-back safety timer based on average suit speed.
+- Consumable reserves burn projection (Spacesuit O₂ and battery capacity).
+- Slope angle stability warnings with bipedal mobility thresholds:
+  - 🟢 **Safe (`< 10°`):** Normal bipedal locomotion.
+  - 🟡 **Caution (`10°–15°`):** Center-of-mass strain; tether robotic MULE rover.
+  - 🔴 **Warning (`> 15°`):** Impassable crater rim scarp requiring switchbacks.
+- Perseverance **Mastcam-Z & Navcam eye-level ground context** so astronauts recognize rock formations upon arrival.
 
 ---
 
-## 8. Local Run & Development
+## 6. Local Run & Deployment
 
-### Prerequisites
-- **Node.js:** v18.0.0 or higher
-- **npm:** v9.0.0 or higher
-
-### Installation & Run Steps
+### Quick Run
 ```bash
-# 1. Clone the repository
-git clone https://github.com/your-username/martian-expedition-intelligence.git
+# Clone and install dependencies
+git clone https://github.com/txtx1182-cyber/martian-expedition-intelligence.git
 cd martian-expedition-intelligence
-
-# 2. Install dependencies
 npm install
 
-# 3. Launch local Vite development server
+# Run Vite dev server
 npm run dev
-
-# 4. Open in browser
-# http://localhost:3000
+# Accessible at http://localhost:3000
 ```
 
-### Production Build
-```bash
-# Compile optimized static bundle
-npm run build
-
-# Preview production build locally
-npm run preview
-```
-
----
-
-## 9. Render Deployment Guide (Static Site)
-
-This project is optimized for deployment on **Render**:
-
-1. Log in to [Render Dashboard](https://dashboard.render.com/).
-2. Click **New +** → **Static Site**.
-3. Connect your **GitHub repository**.
-4. Configure the build parameters:
-   - **Name:** `martian-expedition-intelligence`
-   - **Branch:** `main`
-   - **Build Command:** `npm install && npm run build`
-   - **Publish Directory:** `dist`
-5. Click **Create Static Site**.
-6. Render will automatically build the React 18 application and deploy it to a high-speed global CDN (e.g., `https://martian-expedition-intelligence.onrender.com`).
-
----
-
-## 10. License & Attribution
-Developed for the **NASA Space Apps Challenge 2026**. Planetary scientific data derived from NASA Mars 2020 Perseverance, Mars Reconnaissance Orbiter (HiRISE/CRISM), and MAVEN missions.
+### Static Site Deployment on Render
+- **Build Command:** `npm install && npm run build`
+- **Publish Directory:** `dist`

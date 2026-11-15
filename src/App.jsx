@@ -1,167 +1,105 @@
 import React, { useState } from 'react';
-import TopNav from './components/TopNav';
-import TacticalMap from './components/TacticalMap';
-import HabitatPlanningConsole from './components/HabitatPlanningConsole';
-import EvaVisorMode from './components/EvaVisorMode';
-import WaypointInspectorDrawer from './components/WaypointInspectorDrawer';
-import RouteTradeoffModal from './components/RouteTradeoffModal';
-import SepAlertModal from './components/SepAlertModal';
-import { WAYPOINTS, DATA_LAYERS_CONFIG, ENVIRONMENTAL_CONDITIONS } from './data/marsMissionData';
+import HeaderBar from './components/HeaderBar';
+import LayerDrawer from './components/LayerDrawer';
+import MarsTrekMap from './components/MarsTrekMap';
+import TargetIntelligenceDrawer from './components/TargetIntelligenceDrawer';
+import SepAlertBanner from './components/SepAlertBanner';
+import { RESEARCH_TARGETS, MAP_LAYERS_CONFIG } from './data/marsDossierData';
 
 export default function App() {
-  // Mode: 'HABITAT_CONSOLE' or 'EVA_VISOR'
-  const [currentMode, setCurrentMode] = useState('HABITAT_CONSOLE');
-
-  // Selected Route: 'route_a' or 'route_b'
-  const [selectedRouteId, setSelectedRouteId] = useState('route_a');
-
-  // Selected Waypoint ID (Defaults to WP-04 Cheyava Falls primary site)
-  const [selectedWaypointId, setSelectedWaypointId] = useState('WP-04');
-
-  // Active Layers Map
-  const [activeLayers, setActiveLayers] = useState({
-    optical: true,
-    topography: true,
-    spectral: true,
-    atmospheric: false,
-    radiation: false,
+  // Layer Opacities State
+  const [layerOpacities, setLayerOpacities] = useState({
+    optical: 1.0,
+    jezero_ctx: 0.85,
+    themis_ir: 0.40,
+    mola_dem: 0.35,
   });
+
+  // Active Research Target (defaults to Target 04 Cheyava Falls)
+  const [activeTargetId, setActiveTargetId] = useState('target-04');
+
+  // Corridor line toggle
+  const [showCorridor, setShowCorridor] = useState(true);
+
+  // Environmental / Space weather overlay toggle
+  const [showEnvOverlay, setShowEnvOverlay] = useState(true);
 
   // SEP Alert State
   const [sepAlertActive, setSepAlertActive] = useState(false);
 
-  // Tradeoff Modal State
-  const [isTradeoffModalOpen, setIsTradeoffModalOpen] = useState(false);
-
-  // Field Tasks State
-  const [tasksState, setTasksState] = useState(() => {
-    const initial = {};
-    WAYPOINTS.forEach(wp => {
-      wp.tasks.forEach(t => {
-        initial[t.id] = t.done || false;
-      });
-    });
-    return initial;
-  });
-
-  const toggleTask = (taskId) => {
-    setTasksState(prev => ({
+  const handleOpacityChange = (layerId, newOpacity) => {
+    setLayerOpacities(prev => ({
       ...prev,
-      [taskId]: !prev[taskId]
+      [layerId]: newOpacity
     }));
   };
 
-  const toggleLayer = (layerId) => {
-    setActiveLayers(prev => ({
-      ...prev,
-      [layerId]: !prev[layerId]
-    }));
-  };
-
-  const triggerSepAlert = () => {
+  const handleTriggerSepAlert = () => {
     setSepAlertActive(true);
-    // Auto-enable radiation layer to show the emergency heatmap & shelter vector
-    setActiveLayers(prev => ({
-      ...prev,
-      radiation: true
-    }));
+    setShowEnvOverlay(true);
   };
 
-  const resetSepAlert = () => {
+  const handleResetSepAlert = () => {
     setSepAlertActive(false);
   };
 
-  const handleNavigateToShelter = () => {
-    // Select WP-02 (the boulder alcove with 68% terrain shielding)
-    setSelectedWaypointId('WP-02');
-  };
-
-  const activeWaypoint = WAYPOINTS.find(w => w.id === selectedWaypointId) || null;
+  const activeTarget = RESEARCH_TARGETS.find(t => t.id === activeTargetId) || null;
 
   return (
-    <div className="w-screen h-screen flex flex-col bg-[#070B14] text-slate-100 overflow-hidden font-sans">
-      {/* Top Mission Navigation & Telemetry Command Bar */}
-      <TopNav
-        currentMode={currentMode}
-        setMode={setCurrentMode}
-        selectedRouteId={selectedRouteId}
-        setSelectedRouteId={setSelectedRouteId}
+    <div className="w-screen h-screen flex flex-col bg-[#F8F9FA] text-[#0F172A] font-sans overflow-hidden">
+      {/* Top Editorial Command & Telemetry Bar */}
+      <HeaderBar
         sepAlertActive={sepAlertActive}
-        triggerSepAlert={triggerSepAlert}
-        resetSepAlert={resetSepAlert}
-        environmentalConditions={ENVIRONMENTAL_CONDITIONS}
+        onTriggerSepAlert={handleTriggerSepAlert}
+        onResetSepAlert={handleResetSepAlert}
+        activeTargetId={activeTargetId}
+        onSelectTarget={setActiveTargetId}
       />
 
-      {/* Emergency Solar Energetic Particle (SEP) Warning Banner */}
-      <SepAlertModal
+      {/* Emergency SEP Proton Storm Alarm Dropdown */}
+      <SepAlertBanner
         isActive={sepAlertActive}
         onDismiss={() => setSepAlertActive(false)}
-        onNavigateToShelter={handleNavigateToShelter}
+        onNavigateToShelter={(shelterId) => setActiveTargetId(shelterId)}
       />
 
-      {/* Main Mode Viewport */}
+      {/* Main Full-Viewport Spatial Workspace */}
       <main className="flex-1 w-full h-[calc(100vh-68px)] relative flex overflow-hidden">
-        {currentMode === 'HABITAT_CONSOLE' ? (
-          <div className="w-full h-full flex flex-col lg:flex-row overflow-hidden relative">
-            {/* Left & Center: Tactical Interactive Topographic Map & Planning Workspace */}
-            <div className="flex-1 h-full flex flex-col overflow-hidden relative">
-              {/* Tactical Topographic Map */}
-              <div className="flex-1 h-full min-h-[350px] relative">
-                <TacticalMap
-                  activeLayers={activeLayers}
-                  selectedRouteId={selectedRouteId}
-                  selectedWaypointId={selectedWaypointId}
-                  onSelectWaypoint={setSelectedWaypointId}
-                  sepAlertActive={sepAlertActive}
-                  currentMode={currentMode}
-                  onOpenTradeoffModal={() => setIsTradeoffModalOpen(true)}
-                />
-              </div>
+        {/* Left Floating Drawer: Satellite Tile Layers & Research Corridor */}
+        <LayerDrawer
+          layerOpacities={layerOpacities}
+          onOpacityChange={handleOpacityChange}
+          showCorridor={showCorridor}
+          onToggleCorridor={() => setShowCorridor(prev => !prev)}
+          showEnvOverlay={showEnvOverlay}
+          onToggleEnvOverlay={() => setShowEnvOverlay(prev => !prev)}
+          sepAlertActive={sepAlertActive}
+          onTriggerSepAlert={handleTriggerSepAlert}
+          onResetSepAlert={handleResetSepAlert}
+          activeTargetId={activeTargetId}
+          onSelectTarget={setActiveTargetId}
+        />
 
-              {/* Bottom Drawer: Multi-Layer Planning Console */}
-              <div className="h-60 sm:h-72 border-t border-slate-800 bg-[#070B14] z-20">
-                <HabitatPlanningConsole
-                  activeLayers={activeLayers}
-                  toggleLayer={toggleLayer}
-                  selectedRouteId={selectedRouteId}
-                  setSelectedRouteId={setSelectedRouteId}
-                  onSelectWaypoint={setSelectedWaypointId}
-                  onOpenTradeoffModal={() => setIsTradeoffModalOpen(true)}
-                />
-              </div>
-            </div>
+        {/* Center: Real NASA Mars Trek Satellite Map Engine (Leaflet) */}
+        <div className="flex-1 h-full relative overflow-hidden">
+          <MarsTrekMap
+            layerOpacities={layerOpacities}
+            activeTargetId={activeTargetId}
+            onSelectTarget={setActiveTargetId}
+            sepAlertActive={sepAlertActive}
+            showCorridor={showCorridor}
+            showEnvOverlay={showEnvOverlay}
+          />
+        </div>
 
-            {/* Right Drawer: Waypoint Intelligence & POV Inspector */}
-            {activeWaypoint && (
-              <WaypointInspectorDrawer
-                waypoint={activeWaypoint}
-                onClose={() => setSelectedWaypointId(null)}
-                tasksState={tasksState}
-                onToggleTask={toggleTask}
-              />
-            )}
-          </div>
-        ) : (
-          /* EVA VISOR / WRIST-PAD TACTICAL HUD MODE */
-          <div className="w-full h-full flex overflow-hidden">
-            <EvaVisorMode
-              selectedWaypointId={selectedWaypointId}
-              onSelectWaypoint={setSelectedWaypointId}
-              sepAlertActive={sepAlertActive}
-              tasksState={tasksState}
-              onToggleTask={toggleTask}
-            />
-          </div>
+        {/* Right Slide-over Drawer: Scientific Evidence & Astronaut EVA Intelligence */}
+        {activeTarget && (
+          <TargetIntelligenceDrawer
+            target={activeTarget}
+            onClose={() => setActiveTargetId(null)}
+          />
         )}
       </main>
-
-      {/* Route Trade-Off Analytical Modal */}
-      <RouteTradeoffModal
-        isOpen={isTradeoffModalOpen}
-        onClose={() => setIsTradeoffModalOpen(false)}
-        selectedRouteId={selectedRouteId}
-        onSelectRoute={setSelectedRouteId}
-      />
     </div>
   );
 }
