@@ -91,7 +91,7 @@ export default function App() {
       />
 
       {/* Main Full-Viewport Spatial Workspace */}
-      <main className="flex-1 w-full h-[calc(100vh-68px)] relative flex overflow-hidden">
+      <main className="flex-1 w-full h-[calc(100vh-56px)] relative flex overflow-hidden">
         {/* Left Floating Drawer: Traverse Planner & 4 Planetary Map Modes */}
         <TraversePlannerDrawer
           activeMapMode={activeMapMode}
