@@ -9,23 +9,23 @@ import EnvHonestyModal from './components/EnvHonestyModal';
 import { VERIFIED_TARGETS, PRESET_SORTIES } from './data/marsDossierData';
 
 export default function App() {
-  // 5 Multi-Domain Planetary Map Modes:
-  // 'OPTICAL', 'THEMIS_IR', 'MOLA_ELEVATION', 'CRISM_SPECTRAL', 'HAZARDS'
+  // Planetary Map Modes:
+  // 'OPTICAL', 'MOLA_ELEVATION', 'MOLA_GRAY', 'CELESTIA', 'FREE_BLEND'
   const [activeMapMode, setActiveMapMode] = useState('OPTICAL');
 
   // Tile Layer Opacities
   const [layerOpacities, setLayerOpacities] = useState({
-    hirise_maxres: 0.85,
-    viking_global: 0.35,
-    mola_topo: 0.30,
-    themis_day_ir: 0.25
+    mars_optical: 1.0,
+    mola_color: 0.65,
+    mola_gray: 0.50,
+    celestia_shaded: 0.40
   });
 
-  // Active Target ID (Default to T7 Bright Angel / Cheyava Falls)
-  const [activeTargetId, setActiveTargetId] = useState('T7');
+  // Active Target ID (Default to T4 Bright Angel / Cheyava Falls)
+  const [activeTargetId, setActiveTargetId] = useState('T4');
 
-  // Active Sortie ID (Default to Sortie 1: Neretva -> Bright Angel Micro-EVA ~170m)
-  const [activeSortieId, setActiveSortieId] = useState('sortie-1');
+  // Active Sortie / Expedition ID (Default to Preset 1: Full Basin Transect ~55.6 km)
+  const [activeSortieId, setActiveSortieId] = useState('preset-1');
 
   // Custom User Placed Waypoints
   const [customWaypoints, setCustomWaypoints] = useState([]);
@@ -62,10 +62,10 @@ export default function App() {
     setCustomWaypoints([]);
     setIsPlacingWaypoint(false);
 
-    if (sortieId === 'sortie-1') {
-      setActiveTargetId('T7');
-    } else if (sortieId === 'sortie-2') {
-      setActiveTargetId('T2');
+    if (sortieId === 'preset-1') {
+      setActiveTargetId('T4');
+    } else if (sortieId === 'preset-2') {
+      setActiveTargetId('T3');
     }
   };
 
@@ -92,7 +92,7 @@ export default function App() {
 
       {/* Main Full-Viewport Spatial Workspace */}
       <main className="flex-1 w-full h-[calc(100vh-68px)] relative flex overflow-hidden">
-        {/* Left Floating Drawer: Traverse Planner & 5 Planetary Map Modes */}
+        {/* Left Floating Drawer: Traverse Planner & 4 Planetary Map Modes */}
         <TraversePlannerDrawer
           activeMapMode={activeMapMode}
           onSelectMapMode={setActiveMapMode}
@@ -109,7 +109,7 @@ export default function App() {
           onOpenEnvHonestyModal={() => setIsEnvHonestyOpen(true)}
         />
 
-        {/* Center: Max-Resolution Satellite & Topographic Canvas Engine (Leaflet) */}
+        {/* Center: Real Web Mercator Planetary Satellite Map (Leaflet) */}
         <div className="flex-1 h-full relative flex flex-col overflow-hidden">
           <div className="flex-1 w-full h-full relative overflow-hidden">
             <MarsTrekMap
@@ -127,7 +127,7 @@ export default function App() {
             />
           </div>
 
-          {/* Collapsible Bottom Drawer: Along-Track Elevation Profile (Figure 2) */}
+          {/* Collapsible Bottom Drawer: Along-Track Elevation Profile */}
           <ElevationProfileDrawer
             onHoverPoint={setHoveredTraversePoint}
             hoveredPoint={hoveredTraversePoint}

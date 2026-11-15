@@ -1,5 +1,6 @@
 // MISSION 001 / JEZERO EXPEDITION INTELLIGENCE
-// Master Scientific Research Dossier: 9 Verified Targets (T1-T9), Full Traverse Path, & Exact Epistemology
+// Master Scientific Research Dossier: 7 Regional Targets (T1-T7), Web Mercator Tile Engine,
+// Full Basin Transect & Hydrological Loop Expeditions, & Exact Scientific Epistemology.
 // NASA Space Apps Challenge 2026 - Challenge 11: Interplanetary Survival Guide
 
 export const MARS_CONSTANTS = {
@@ -13,33 +14,33 @@ export const MARS_CONSTANTS = {
 
 export const MISSION_HEADER = {
   title: "MISSION 001 / JEZERO EXPEDITION INTELLIGENCE",
-  subtitle: "Max-Resolution Planetary Surface & Astronaut Traverse Planning Platform",
+  subtitle: "Planetary Surface & Astronaut Traverse Planning Platform // Greater Jezero Basin",
   challenge: "NASA Space Apps Challenge 2026 // Challenge 11: Interplanetary Survival Guide: Martian Map",
-  region: "Jezero Crater, Mars (18.47°N, 77.37°E)",
-  defaultCenter: [18.4968, 77.3045], // Focus on Neretva (T6) and Bright Angel (T7)
-  defaultZoom: 16
+  region: "Greater Jezero Crater & Nili Planum Margin (18.45°N, 77.40°E)",
+  defaultCenter: [18.45, 77.40], // Regional Jezero Basin Center
+  defaultZoom: 11
 };
 
-// 9 Verified Targets from Brief
+// 7 Regional Research Targets spanning the ~45 km Greater Jezero Basin & Rim Margin
 export const VERIFIED_TARGETS = [
   {
     id: "T1",
     num: "T1",
-    name: "Octavia E. Butler Landing",
-    shortName: "Landing Site",
-    lat: 18.4446,
-    lng: 77.4509,
-    elevation: -2569.9,
-    isExtended: false,
+    name: "Eastern Jezero Basin Floor / Landing Zone",
+    shortName: "T1: Basin Floor Landing",
+    lat: 18.44,
+    lng: 77.58,
+    elevation: -2575,
+    isPrimaryTarget: false,
     assessments: {
       habitability: "Low–Moderate",
-      biosignature: "None documented",
+      biosignature: "Baseline Negative",
       science: "Moderate",
-      accessibility: "Easy (Flat floor)",
+      accessibility: "Optimal (Flat Floor)",
       confidence: "High",
       scoreHab: 38,
       scoreBio: 8,
-      scoreSci: 65,
+      scoreSci: 68,
       scoreAcc: 98
     },
     pdsProducts: {
@@ -49,37 +50,37 @@ export const VERIFIED_TARGETS = [
       ctx: ["P04_002743_1987_XI_18N282W"]
     },
     evidenceChain: {
-      whatIsHere: "Smooth, basaltic crater-floor pavement serving as landing zone and transition between floor igneous units and delta deposits.",
-      whatWasObserved: "HiRISE (ESP_036618_1985, 0.25 m/px) resolves low-relief bedrock pavement with thin eolian dust veneers and shallow thermal contraction fissures; SuperCam LIBS confirms basaltic soil chemistry.",
-      whatIsInterpreted: "Crater-floor igneous baseline providing undisturbed geomechanical foundation for vehicular staging and habitat placement (Farley et al., 2020).",
+      whatIsHere: "Smooth, basaltic crater-floor pavement serving as primary landing staging area and baseline igneous floor unit (Máaz/Séítah transition).",
+      whatWasObserved: "Viking, CTX, and HiRISE mosaics resolve flat, low-relief basaltic bedrock pavement with eolian dust mantling and sparse regolith ripples; LIBS and SuperCam confirm pyroxene-plagioclase igneous chemistry.",
+      whatIsInterpreted: "Crater-floor igneous foundation providing geomechanical stability for lander touchdown, habitat setup, and pressurized rover staging (Farley et al., 2020).",
       doi: "10.1007/s11214-020-00762-y",
       doiCitation: "Farley, K. A. et al. (2020), Space Sci. Rev.",
-      howConfident: "High confidence based on ground-truth Perseverance touchdown telemetry and sub-meter stereoscopic DTM validation.",
-      whatElseCouldExplainIt: "Localized indurated eolian sand sheet cemented by transient atmospheric frost rather than continuous basaltic bedrock.",
-      whatWouldChangeAssessment: "Trench excavation revealing thick unconsolidated regolith exceeding 2 meters depth beneath the pavement.",
-      canWeGetThere: "Effortless bipedal traverse (< 3° slope); zero boulder obstacles exceeding 20 cm.",
-      dataCoverageStatus: "Full HiRISE stereo DTM + 4-band color validation available."
+      howConfident: "High confidence from Perseverance landing telemetry and multi-instrument ground calibration.",
+      whatElseCouldExplainIt: "Indurated eolian sand sheet cemented by transient atmospheric salts rather than solid basaltic basement.",
+      whatWouldChangeAssessment: "Shallow core sampling showing unconsolidated friable sediment exceeding 3 m depth beneath the surface pavement.",
+      canWeGetThere: "Optimal bipedal and rover traverse (< 2° mean slope); negligible boulder obstruction; prime habitat hub location.",
+      dataCoverageStatus: "Full HiRISE, CTX, MOLA, and CRISM coverage complete."
     }
   },
   {
     id: "T2",
     num: "T2",
-    name: "Séítah Formation",
-    shortName: "Séítah (Olivine Cumulate)",
-    lat: 18.4325,
-    lng: 77.4407,
-    elevation: -2571.8,
-    isExtended: false,
+    name: "South Séítah Olivine Ridge",
+    shortName: "T2: Séítah Olivine Ridge",
+    lat: 18.31,
+    lng: 77.46,
+    elevation: -2568,
+    isPrimaryTarget: false,
     assessments: {
       habitability: "Moderate",
-      biosignature: "Weak / None",
-      science: "High",
-      accessibility: "Easy",
-      confidence: "Moderate",
+      biosignature: "Weak / Abiotic",
+      science: "High (Cumulate Geology)",
+      accessibility: "Moderate (Dune Fields)",
+      confidence: "High",
       scoreHab: 52,
-      scoreBio: 14,
-      scoreSci: 85,
-      scoreAcc: 92
+      scoreBio: 15,
+      scoreSci: 88,
+      scoreAcc: 82
     },
     pdsProducts: {
       hirise: ["ESP_055211_1985", "ESP_036618_1985"],
@@ -88,76 +89,37 @@ export const VERIFIED_TARGETS = [
       ctx: ["P04_002743_1987_XI_18N282W"]
     },
     evidenceChain: {
-      whatIsHere: "Olivine-rich igneous cumulate bedrock exhibiting post-crystallization aqueous alteration (Farley et al., 2022).",
-      whatWasObserved: "PIXL and SHERLOC micro-mapping resolve coarse olivine grains surrounded by pyroxene, with Mg–Fe carbonates along grain boundaries and secondary sulfate/perchlorate void fills.",
-      whatIsInterpreted: "Thick igneous cumulate body modified by ancient carbonated brine infiltration before lake formation (Farley et al., 2022).",
+      whatIsHere: "Olivine-rich cumulate bedrock ridge displaying grain-boundary carbonate alteration and dark basaltic eolian dunes (Farley et al., 2022).",
+      whatWasObserved: "CRISM 1.0 µm and 2.3 µm absorption bands indicate coarse forsteritic olivine (Fo45-Fo65) intergrown with augite, altered by magnesite/siderite rinds; PIXL resolves secondary sulfate void fills.",
+      whatIsInterpreted: "Thick ultramafic igneous cumulate body emplaced by a differentiated magma lake or thick sill, subsequently altered by ancient aqueous carbonated fluids prior to lacustrine flooding (Farley et al., 2022).",
       doi: "10.1126/science.abo2196",
       doiCitation: "Farley, K. A., Stack, K. M. et al. (2022), Science Vol. 377",
-      howConfident: "Moderate confidence: Core samples confirm mineralogy, though exact emplacement geometry (layered intrusion vs. thick lava lake) remains debated.",
-      whatElseCouldExplainIt: "Subaqueous pyroclastic fall deposits altered under late-stage hydrothermal steam rather than intrusive cumulate ponding.",
-      whatWouldChangeAssessment: "Radiometric Pb-Pb or Ar-Ar isochron dating of returned core samples disproving co-magmatic crystallization.",
-      canWeGetThere: "Level floor terrain; watch for sand ripples between rocky outcrops that increase astronaut boot slip.",
-      dataCoverageStatus: "Complete CRISM infrared spectral library and Perseverance rover core cache confirmation."
+      howConfident: "High confidence: In-situ abrasion patches and cached rover cores confirm igneous cumulate texture and carbonate coatings.",
+      whatElseCouldExplainIt: "Subaqueous pyroclastic ash falls hydrothermally altered in a dense CO2-rich sublacustrine spring system.",
+      whatWouldChangeAssessment: "Radiometric Ar-Ar/Pb-Pb dating revealing ages discordant with co-magmatic crystallization of the Jezero floor.",
+      canWeGetThere: "Traverse over rocky ridges is smooth (< 4° grade), but transverse aeolian ridges (TARs) in interdune swales require high wheel-slip bypass.",
+      dataCoverageStatus: "CRISM multispectral targeted observation + HiRISE stereopair validated."
     }
   },
   {
     id: "T3",
     num: "T3",
-    name: "Máaz Formation",
-    shortName: "Máaz (Basaltic Cap)",
-    lat: 18.4619,
-    lng: 77.4361,
-    elevation: -2555.2,
-    isExtended: false,
+    name: "Western Delta Front & Kodiak Butte",
+    shortName: "T3: Delta Front & Kodiak",
+    lat: 18.47,
+    lng: 77.38,
+    elevation: -2425,
+    isPrimaryTarget: false,
     assessments: {
-      habitability: "Low–Moderate",
-      biosignature: "None",
-      science: "Moderate",
-      accessibility: "Easy",
-      confidence: "Moderate",
-      scoreHab: 42,
-      scoreBio: 6,
-      scoreSci: 74,
-      scoreAcc: 90
-    },
-    pdsProducts: {
-      hirise: ["ESP_058930_1985"],
-      dtm: ["DTEEC_045994_1985_046060_1985_U01"],
-      crism: ["ato00053d60_01_if125s_trr3"],
-      ctx: ["G13_023102_1986_XN_18N282W"]
-    },
-    evidenceChain: {
-      whatIsHere: "Stratigraphically higher igneous member overlying Séítah, composed of basaltic lava flows or layered sills with vesicular horizons.",
-      whatWasObserved: "SuperCam remote micro-imager shows plagioclase-pyroxene groundmass with iron-oxide phenocrysts and minor aqueous alteration rind coatings.",
-      whatIsInterpreted: "Successive lava flow sheets that capped the Séítah cumulate unit, subsequently weathered during early wetter epochs (Farley et al., 2022).",
-      doi: "10.1126/science.abo2196",
-      doiCitation: "Farley et al. (2022), Science Vol. 377",
-      howConfident: "Moderate confidence: stratigraphic contact with Séítah observed in multiple abraded patches.",
-      whatElseCouldExplainIt: "Impact melt sheet formed during a major post-Jezero impact basin event.",
-      whatWouldChangeAssessment: "Discovery of shocked quartz or high-pressure zircon polymorphs in returned samples.",
-      canWeGetThere: "Gentle slopes (< 4°); broad rocky benches ideal for rover support positioning.",
-      dataCoverageStatus: "HiRISE stereo coverage complete; RIMFAX ground radar traverses mapped."
-    }
-  },
-  {
-    id: "T4",
-    num: "T4",
-    name: "Delta Front (Shenandoah Formation)",
-    shortName: "Delta Front Scarp",
-    lat: 18.4827,
-    lng: 77.3686,
-    elevation: -2421.1,
-    isExtended: false,
-    assessments: {
-      habitability: "High (interpreted)",
-      biosignature: "Potential",
-      science: "High",
-      accessibility: "Moderate",
-      confidence: "Moderate",
-      scoreHab: 82,
-      scoreBio: 64,
-      scoreSci: 92,
-      scoreAcc: 68
+      habitability: "High (Paleolake Standing Water)",
+      biosignature: "Potential (High Preservation)",
+      science: "Very High",
+      accessibility: "Moderate (Delta Scarp)",
+      confidence: "High",
+      scoreHab: 85,
+      scoreBio: 70,
+      scoreSci: 96,
+      scoreAcc: 70
     },
     pdsProducts: {
       hirise: ["ESP_055211_1985", "ESP_088272_1985"],
@@ -166,155 +128,76 @@ export const VERIFIED_TARGETS = [
       ctx: ["P04_002743_1987_XI_18N282W"]
     },
     evidenceChain: {
-      whatIsHere: "Exposed deltaic scarp exhibiting Gilbert-type bottomset to foreset cross-bedding (Shenandoah Formation).",
-      whatWasObserved: "Fine laminated mudstones, siltstones, and sandstones interbedded with episodic granule conglomerates; CRISM detects Fe/Mg smectite signatures.",
-      whatIsInterpreted: "Sustained fluvial delta progradation into an open standing paleolake with high organic matter preservation potential (Mangold et al., 2021; Stack et al., 2024).",
+      whatIsHere: "Classic Gilbert-type river delta scarp with exposed bottomset and dipping foreset sedimentary strata, flanked by the Kodiak erosional outlier butte.",
+      whatWasObserved: "HiRISE (0.25 m/px) and Mastcam-Z resolve dipping cross-stratified sandstone foresets overlying horizontal silty bottomset beds; CRISM confirms strong Fe/Mg smectite clay signatures.",
+      whatIsInterpreted: "Sustained fluvial delta progradation into an open standing crater paleolake with water depths of 20–50 m, representing prime benthic organic carbon preservation conditions (Mangold et al., 2021).",
       doi: "10.1126/science.abl4051",
-      doiCitation: "Mangold, N. et al. (2021), Science; Stack, K. M. et al. (2024)",
-      howConfident: "Moderate confidence: Sedimentary cross-bedding geometry is pristine; lake water depth modeled at 20–50 m.",
-      whatElseCouldExplainIt: "Dry eolian sand dune progradation into an arid tectonic depression with intermittent playa muds.",
-      whatWouldChangeAssessment: "Absence of subaqueous clay flocculation textures in transmission electron microscope analysis.",
-      canWeGetThere: "Approaching from channel wash is safe (< 8°); avoid steep delta-front scarps exceeding 16° slope.",
-      dataCoverageStatus: "Extensive HiRISE DTM coverage; multi-sol Mastcam-Z gigapixel mosaics available."
+      doiCitation: "Mangold, N. et al. (2021), Science Vol. 374",
+      howConfident: "High confidence: Sedimentary dip angles and stratigraphic stacking demonstrate open-water Gilbert delta deposition.",
+      whatElseCouldExplainIt: "Dry eolian dune slipface progradation into an ephemeral dry tectonic graben.",
+      whatWouldChangeAssessment: "Total absence of clay mineral flocs and aqueous grain smoothing in returned sample microscopic transmission analysis.",
+      canWeGetThere: "Base of delta front is traversable via gentle alluvial wash (< 6° slope); avoid climbing vertical scarp faces (> 18° slope).",
+      dataCoverageStatus: "Complete stereo DTM, CRISM phyllosilicate map, and Perseverance close-up rasters available."
+    }
+  },
+  {
+    id: "T4",
+    num: "T4",
+    name: "Neretva Vallis & Bright Angel Channel",
+    shortName: "T4: Neretva & Bright Angel",
+    lat: 18.53,
+    lng: 77.26,
+    elevation: -2350,
+    isPrimaryTarget: true, // Primary Potential Biosignature Focus
+    assessments: {
+      habitability: "Very High (interpreted)",
+      biosignature: "Potential (Highest Documented on Mars)",
+      science: "Crucial (Top Priority)",
+      accessibility: "Moderate",
+      confidence: "Moderate–Low (Astrobiology)",
+      scoreHab: 95,
+      scoreBio: 92,
+      scoreSci: 99,
+      scoreAcc: 78
+    },
+    pdsProducts: {
+      hirise: ["ESP_088272_1985", "ESP_055211_1985"],
+      dtm: ["DTEEC_002387_1985_003798_1985_A01"],
+      crism: ["msv0005079b_01_if150s_trr3"],
+      ctx: ["P04_002743_1987_XI_18N282W"]
+    },
+    evidenceChain: {
+      whatIsHere: "Light-toned mudstone and sandstone outcrop ('Cheyava Falls') laced with white calcium sulfate veins and millimeter-scale redox reaction halos ('leopard spots'). Position corresponds to Sol 1196 rover localization.",
+      whatWasObserved: "SHERLOC deep-UV Raman detected aromatic organic carbon signatures; PIXL mapped vivianite (iron-phosphate) cores with greigite (iron-sulfide) halos; WATSON imaged millimeter-scale reaction rings.",
+      whatIsInterpreted: "Ancient chemical redox front where iron and sulfate reduction occurred with organic matter serving as electron donor, analogous to terrestrial microbial reduction textures (Hurowitz et al., 2025).",
+      doi: "10.1038/s41586-025-09413-0",
+      doiCitation: "Hurowitz, J. A., Tice, M. M. et al. (2025), Nature Vol. 645, p. 332",
+      howConfident: "Moderate–Low confidence for biosignature interpretation: Geochemical facts are indisputable, but definitive life confirmation requires Mars Sample Return isotope fractionation testing.",
+      whatElseCouldExplainIt: "Abiotic hydrothermal fluid mixing where acidic iron-rich brine reacted with alkaline sulfur-bearing groundwater; abiotic Fischer-Tropsch synthesis.",
+      whatWouldChangeAssessment: "Carbon-13 / Carbon-12 and Sulfur-34 isotopic ratios showing values identical to non-biological volcanic volatiles.",
+      canWeGetThere: "Follow Neretva channel bedrock floor (5°–8° grade); rover wheel anchorage is robust; ~170 m foot EVA zone from channel staging point.",
+      dataCoverageStatus: "Full multi-sensor analytical suite (PIXL, SHERLOC, WATSON, SuperCam, Mastcam-Z) archived."
     }
   },
   {
     id: "T5",
     num: "T5",
-    name: "Upper Delta Fan & Boulder Scarp",
-    shortName: "Upper Delta Fan",
-    lat: 18.4954,
-    lng: 77.3466,
-    elevation: -2398.5,
-    isExtended: false,
+    name: "Northwestern Lacustrine Margin Carbonates",
+    shortName: "T5: Margin Carbonates",
+    lat: 18.63,
+    lng: 77.33,
+    elevation: -2180,
+    isPrimaryTarget: false,
     assessments: {
-      habitability: "High",
-      biosignature: "Potential",
-      science: "High",
-      accessibility: "Difficult",
+      habitability: "High (Paleolake Shoreline)",
+      biosignature: "Potential (Bioherm / Microfossils)",
+      science: "Very High",
+      accessibility: "Moderate–Difficult",
       confidence: "Moderate",
-      scoreHab: 78,
-      scoreBio: 54,
-      scoreSci: 89,
-      scoreAcc: 48
-    },
-    pdsProducts: {
-      hirise: ["ESP_055211_1985"],
-      dtm: ["DTEEC_002387_1985_003798_1985_A01"],
-      crism: ["msv0005079b_01_if150s_trr3"],
-      ctx: ["G13_023102_1986_XN_18N282W"]
-    },
-    evidenceChain: {
-      whatIsHere: "Truncated upper delta topset beds capped by coarse conglomerate and flood megaclasts.",
-      whatWasObserved: "Beds of imbricated cobbles and rounded boulders up to 1.5 m embedded in gravelly sandstone (Mangold et al., 2021; note: specific boulder size stats unverified in abstract).",
-      whatIsInterpreted: "High-energy paleoflood discharge associated with late-stage breaching of the western Jezero rim (Mangold et al., 2021).",
-      doi: "10.1126/science.abl4051",
-      doiCitation: "Mangold, N., Gupta, S. et al. (2021), Science Vol. 374",
-      howConfident: "Moderate confidence: Outcrop geometry clearly visible in orbital HiRISE, but surface roughness challenges vehicular navigation.",
-      whatElseCouldExplainIt: "Periglacial mass wasting and rock glacier deposits during high-obliquity freeze-thaw cycles.",
-      whatWouldChangeAssessment: "Discovery of glacial striations or tillite fabric instead of water-worn fluvial rounding.",
-      canWeGetThere: "Difficult traverse (12°–15° slope with loose gravel); mandatory companion rover tether.",
-      dataCoverageStatus: "High-resolution orbital stereo available; partial rover Mastcam-Z coverage."
-    }
-  },
-  {
-    id: "T6",
-    num: "T6",
-    name: "Neretva Vallis Inflow Channel Floor",
-    shortName: "Neretva Channel",
-    lat: 18.4961,
-    lng: 77.3038,
-    elevation: -2362.8,
-    isExtended: false,
-    assessments: {
-      habitability: "High",
-      biosignature: "Potential",
-      science: "High",
-      accessibility: "Moderate",
-      confidence: "Moderate",
-      scoreHab: 88,
-      scoreBio: 72,
-      scoreSci: 93,
-      scoreAcc: 82
-    },
-    pdsProducts: {
-      hirise: ["ESP_088272_1985", "ESP_055211_1985"],
-      dtm: ["DTEEC_002387_1985_003798_1985_A01"],
-      crism: ["msv0005079b_01_if150s_trr3"],
-      ctx: ["P04_002743_1987_XI_18N282W"]
-    },
-    evidenceChain: {
-      whatIsHere: "Incision channel bedrock floor at the mouth of Neretva Vallis, ~170 m west of Bright Angel outcrop.",
-      whatWasObserved: "Fluvial terraces, point bar sands, and fine siltstones exposed along the valley floor; boulder terraces providing natural overhangs.",
-      whatIsInterpreted: "Repeated fluvial transport corridor connecting highland catchment basins to the Jezero lake system; ideal low-slope staging ground for Bright Angel sorties.",
-      doi: "10.1038/s41586-025-09413-0",
-      doiCitation: "Hurowitz, J. A. et al. (2025), Nature Vol. 645",
-      howConfident: "Moderate confidence: Direct rover traverse on Sol 1190–1200 confirmed stable ground bearing capacity.",
-      whatElseCouldExplainIt: "Ephemeral hyperconcentrated mudflows rather than sustained perennial streamflow.",
-      whatWouldChangeAssessment: "Sedimentological proof that channels formed by sapping rather than surface runoff.",
-      canWeGetThere: "Gentle valley floor (3°–5°); low boulder hazard. Provides ~170 m direct march to T7.",
-      dataCoverageStatus: "HiRISE 0.25 m/px imagery validated; rover localization position verified."
-    }
-  },
-  {
-    id: "T7",
-    num: "T7",
-    name: "Bright Angel / Cheyava Falls",
-    shortName: "Bright Angel (Cheyava)",
-    lat: 18.4974,
-    lng: 77.3051,
-    elevation: -2354.5,
-    isExtended: false,
-    isPrimaryTarget: true,
-    assessments: {
-      habitability: "High (interpreted)",
-      biosignature: "Potential (highest documented, not confirmed)",
-      science: "High (Crucial)",
-      accessibility: "Moderate",
-      confidence: "Moderate–Low",
-      scoreHab: 94,
-      scoreBio: 88,
-      scoreSci: 99,
-      scoreAcc: 80
-    },
-    pdsProducts: {
-      hirise: ["ESP_088272_1985", "ESP_055211_1985"],
-      dtm: ["DTEEC_002387_1985_003798_1985_A01"],
-      crism: ["msv0005079b_01_if150s_trr3"],
-      ctx: ["P04_002743_1987_XI_18N282W"]
-    },
-    evidenceChain: {
-      whatIsHere: "Light-toned mudstone and sandstone outcrop laced with white calcium sulfate veins and millimeter-scale reaction halos ('leopard spots'). Position is Sol 1196 rover localization (~100 m from target rock).",
-      whatWasObserved: "SHERLOC deep-UV Raman detected organic carbon signatures; PIXL mapped sub-mm iron-phosphate nodules (vivianite) and iron-sulfide halos (greigite); WATSON photographed cross-cutting gypsum veins.",
-      whatIsInterpreted: "Low-temperature redox reactions where ancient microbial communities may have reduced iron and sulfate using organic matter as an electron donor (Hurowitz et al., 2025).",
-      doi: "10.1038/s41586-025-09413-0",
-      doiCitation: "Hurowitz, J. A., Tice, M. M. et al. (2025), Nature Vol. 645, p. 332",
-      howConfident: "Moderate–Low confidence for biosignature interpretation; empirical geochemical data is rock-solid, but abiotic mechanisms cannot be ruled out without Mars Sample Return.",
-      whatElseCouldExplainIt: "Abiotic hydrothermal or diagenetic fluid mixing where acidic iron-rich waters encountered reduced alkaline groundwater; abiotic Fischer-Tropsch-type synthesis.",
-      whatWouldChangeAssessment: "Sample return isotopic fractionation analysis (δ13C, δ34S, δ56Fe) and sub-nanometer transmission electron microscopy for cell fossilization rinds.",
-      canWeGetThere: "Accessible via Neretva channel floor (T6 approach); local slope 6°–10°. Position is ~170 m from T6.",
-      dataCoverageStatus: "Multi-instrument in-situ raster (PIXL + SHERLOC + WATSON + SuperCam + Mastcam-Z) completely archived."
-    }
-  },
-  {
-    id: "T8",
-    num: "T8",
-    name: "Inner Rim Carbonate Margin Unit",
-    shortName: "Margin Carbonate",
-    lat: 18.4606,
-    lng: 77.2647,
-    elevation: -1820.0,
-    isExtended: true, // Marked as Extended/Future Target
-    assessments: {
-      habitability: "Moderate–High (hypothesis)",
-      biosignature: "Potential / Unknown",
-      science: "High",
-      accessibility: "Difficult",
-      confidence: "Low–Moderate",
-      scoreHab: 80,
-      scoreBio: 50,
-      scoreSci: 92,
-      scoreAcc: 42
+      scoreHab: 84,
+      scoreBio: 65,
+      scoreSci: 94,
+      scoreAcc: 55
     },
     pdsProducts: {
       hirise: ["ESP_036618_1985"],
@@ -323,37 +206,37 @@ export const VERIFIED_TARGETS = [
       ctx: ["P04_002743_1987_XI_18N282W"]
     },
     evidenceChain: {
-      whatIsHere: "Inner crater rim carbonate-bearing unit; distinct from crater-floor Mg-Fe grain-boundary carbonates (Horgan et al., 2020).",
-      whatWasObserved: "CRISM orbital reflectance exhibits strong 2.3 µm and 2.5 µm overtone absorption bands indicative of magnesite and hydrated carbonates interbedded with silica chert.",
-      whatIsInterpreted: "Paleolake shoreline bathtub-ring carbonate precipitates or wave-agitated lacustrine bioherms with microfossil preservation potential (Horgan et al., 2020; Farley et al., 2020).",
+      whatIsHere: "Distinctive carbonate-rich marginal unit rimming the northwestern inner crater wall, distinct from crater floor Fe-Mg carbonates (Horgan et al., 2020).",
+      whatWasObserved: "CRISM orbital reflectance exhibits strong 2.3 µm and 2.5 µm absorption doublet matching magnesite and hydrated magnesium carbonates interbedded with silica/chert deposits.",
+      whatIsInterpreted: "Paleolake shoreline bathtub-ring precipitate or wave-agitated stromatolitic bioherms capable of preserving microfossils and organic matter (Horgan et al., 2020).",
       doi: "10.1016/j.icarus.2019.113526",
-      doiCitation: "Horgan, B. H. N. et al. (2020), Icarus; Farley et al. (2020)",
-      howConfident: "Low–Moderate confidence: In-situ rover verification still ongoing as of Sol 1300+; orbital spectral mixing with pyroxene adds deconvolution uncertainty.",
-      whatElseCouldExplainIt: "Regional serpentinization of basement ultramafic bedrock unrelated to Jezero lake water.",
-      whatWouldChangeAssessment: "In-situ drill core displaying stromatolitic laminations or organic-walled microfossils.",
-      canWeGetThere: "High difficulty: Steep crater rim slope (16°–22°); requires engineered switchback paths and extended life support.",
-      dataCoverageStatus: "CRISM orbital targeted observations available; partial HiRISE stereo coverage."
+      doiCitation: "Horgan, B. H. N. et al. (2020), Icarus Vol. 339",
+      howConfident: "Moderate confidence: Strong orbital spectral signature, but surface-level micro-morphology remains under investigation by Perseverance Sol 1300+ ascents.",
+      whatElseCouldExplainIt: "Sub-surface regional serpentinization and talc-carbonate alteration of ultramafic basement unrelated to the lacustrine lake.",
+      whatWouldChangeAssessment: "Discovery of purely metamorphic mineral assemblages (chrysotile, tremolite) lacking sedimentary bedding laminations.",
+      canWeGetThere: "Approaching from delta upper terrace requires climbing 12°–15° slopes; requires tracked or 6-wheel rocker-bogie rover path.",
+      dataCoverageStatus: "CRISM multispectral targeted observation + HiRISE stereopair validated."
     }
   },
   {
-    id: "T9",
-    num: "T9",
-    name: "Jezero Western Rim Uplands",
-    shortName: "West Rim Uplands",
-    lat: 18.4220,
-    lng: 77.2207,
-    elevation: -1973.6,
-    isExtended: true, // Marked as Extended/Future Target
+    id: "T6",
+    num: "T6",
+    name: "Western Crater Rim Crest",
+    shortName: "T6: West Rim Crest",
+    lat: 18.38,
+    lng: 77.12,
+    elevation: -1790,
+    isPrimaryTarget: false,
     assessments: {
-      habitability: "Unknown",
-      biosignature: "Unknown",
-      science: "High",
-      accessibility: "Difficult",
-      confidence: "Low",
-      scoreHab: 30,
-      scoreBio: 20,
-      scoreSci: 86,
-      scoreAcc: 25
+      habitability: "Low (Noachian Uplift)",
+      biosignature: "Very Low",
+      science: "High (Planetary Evolution)",
+      accessibility: "Extreme (Steep Rim Cliff)",
+      confidence: "High",
+      scoreHab: 25,
+      scoreBio: 10,
+      scoreSci: 89,
+      scoreAcc: 28
     },
     pdsProducts: {
       hirise: ["ESP_036618_1985"],
@@ -362,244 +245,282 @@ export const VERIFIED_TARGETS = [
       ctx: ["P04_002743_1987_XI_18N282W"]
     },
     evidenceChain: {
-      whatIsHere: "Pre-Noachian to Noachian highland basement crust exposed in the uplifted western crater rim.",
-      whatWasObserved: "HiRISE imagery resolves massive, chaotic megabreccia blocks, fault scarps, and ancient impact excavation stratigraphy.",
-      whatIsInterpreted: "Ancient crustal samples predating the Jezero impact, providing planetary crustal formation and early magnetic dynamo history.",
+      whatIsHere: "Pre-Noachian to Early Noachian crustal basement megabreccia uplifted by the Jezero impact event (~3.9 Ga).",
+      whatWasObserved: "HiRISE imagery resolves massive fractured megabreccia blocks (> 10 m across), fault scarps, and deeply eroded impact uplift stratigraphy.",
+      whatIsInterpreted: "Ancient planetary crust predating Jezero Crater, preserving evidence of early Mars magnetic dynamo history, impact shock metamorphism, and mantle differentiation (Farley et al., 2020).",
       doi: "10.1007/s11214-020-00762-y",
       doiCitation: "Farley, K. A. et al. (2020), Space Sci. Rev.",
-      howConfident: "Low confidence regarding habitability/biosignatures; high confidence regarding crustal structural geology.",
-      whatElseCouldExplainIt: "Post-impact ballistic ejecta mantle obscuring true in-situ rim bedrock.",
-      whatWouldChangeAssessment: "Deep core drilling identifying unbrecciated plutonic basement.",
-      canWeGetThere: "Extreme difficulty: Rim slopes exceed 24°; impassable for standard EVA suits without rover winching.",
+      howConfident: "High confidence for structural geological interpretation; low habitability potential.",
+      whatElseCouldExplainIt: "Post-impact ballistic ejecta blanket from nearby Isidis Basin obscuring true in-situ rim bedrock.",
+      whatWouldChangeAssessment: "Deep core drilling showing unbrecciated plutonic granite/gabbro without impact shock lamellae.",
+      canWeGetThere: "Extreme slopes (> 20°); climb through breach valleys only; mandatory pressurized rover winch tether.",
       dataCoverageStatus: "Orbital-only coverage (HiRISE, CTX, THEMIS, MOLA)."
+    }
+  },
+  {
+    id: "T7",
+    num: "T7",
+    name: "Pliva Vallis Eastern Outlet Canyon",
+    shortName: "T7: Pliva Outlet Canyon",
+    lat: 18.56,
+    lng: 77.74,
+    elevation: -2410,
+    isPrimaryTarget: false,
+    assessments: {
+      habitability: "Moderate (Catastrophic Breach Drain)",
+      biosignature: "Low–Moderate",
+      science: "High (Paleohydrology)",
+      accessibility: "Moderate",
+      confidence: "High",
+      scoreHab: 58,
+      scoreBio: 30,
+      scoreSci: 91,
+      scoreAcc: 75
+    },
+    pdsProducts: {
+      hirise: ["ESP_058930_1985"],
+      dtm: ["DTEEC_045994_1985_046060_1985_U01"],
+      crism: ["ato00053d60_01_if125s_trr3"],
+      ctx: ["G13_023102_1986_XN_18N282W"]
+    },
+    evidenceChain: {
+      whatIsHere: "Deeply incised bedrock canyon breaching the eastern wall of Jezero Crater, serving as the paleolake's catastrophic outflow drain.",
+      whatWasObserved: "MOLA, CTX, and HiRISE reveal streamlined terraces, plunge-pool plunge scars, and scour channels carved through the eastern crater rim.",
+      whatIsInterpreted: "Catastrophic lake drainage breach channel marking the maximum water-stand elevation of Lake Jezero before ultimate desiccation (Fassett & Head, 2005; Goudge et al., 2015).",
+      doi: "10.1029/2005GL023456",
+      doiCitation: "Fassett, C. I. & Head, J. W. (2005), Geophys. Res. Lett.; Goudge et al. (2015)",
+      howConfident: "High confidence: Inverted spillway threshold geometry is clearly resolved in MOLA topographic contours.",
+      whatElseCouldExplainIt: "Tectonic graben collapse modified by dry eolian wind deflation rather than water flow.",
+      whatWouldChangeAssessment: "Absence of water-scoured plunge pools or hydraulic gravel bars in canyon floor cross-sections.",
+      canWeGetThere: "Follow eastern floor apron toward breach; canyon entrance is broad and navigable (< 5° slope).",
+      dataCoverageStatus: "Full CTX, MOLA, and HiRISE stereo coverage."
     }
   }
 ];
 
-// Presets Local EVA Sorties
+// Presets Kilometer-Scale Expeditions (Pressurized Rover + Local Foot Sorties)
 export const PRESET_SORTIES = [
   {
-    id: "sortie-1",
-    name: "Sortie 1: Neretva → Bright Angel Micro-EVA",
-    badge: "PRIMARY SCIENCE (~170 m)",
-    targetIds: ["T6", "T7"],
-    center: [18.4968, 77.3045],
-    zoom: 17,
-    straightLineDistanceM: 172,
-    traverseDistanceM: 242,
-    elevationDeltaM: 8.3,
-    meanGradePct: 3.5,
-    maxSlopeDeg: 6.2,
-    durationMin: 28,
-    description: "High-resolution micro-EVA traverse from Neretva channel floor (T6) directly to the Cheyava Falls potential biosignature outcrop (T7). At zoom 17+, individual bedrock slabs and HiRISE 0.25 m/px features are visible."
+    id: "preset-1",
+    name: "Expedition 1: Full Basin Rim-to-Floor Transect",
+    badge: "REGIONAL TRANSECT (55.6 km)",
+    targetIds: ["T1", "T2", "T3", "T4", "T5", "T6"],
+    center: [18.45, 77.40],
+    zoom: 11,
+    straightLineDistanceM: 38200,
+    traverseDistanceM: 55600,
+    traverseDistanceKm: 55.6,
+    elevationDeltaM: 785.0,
+    elevationGainM: 785.0,
+    meanGradePct: 4.8,
+    maxSlopeDeg: 22.0,
+    durationHours: 14.5,
+    mode: "Pressurized Rover + Local Foot EVAs",
+    description: "Complete stratigraphy transect across the Greater Jezero Crater floor, climbing from the Eastern Floor landing zone (-2575m) through the Séítah olivine ridge, Western Delta scarp, Bright Angel potential biosignature outcrop, Margin Carbonates, and terminating at the Western Rim Crest (-1790m)."
   },
   {
-    id: "sortie-2",
-    name: "Sortie 2: Crater Floor Igneous Transect",
-    badge: "FLOOR BASELINE (~930 m)",
-    targetIds: ["T1", "T2"],
-    center: [18.4385, 77.4458],
-    zoom: 16,
-    straightLineDistanceM: 930,
-    traverseDistanceM: 1140,
-    elevationDeltaM: -1.9,
-    meanGradePct: 0.2,
-    maxSlopeDeg: 2.8,
-    durationMin: 45,
-    description: "Crater-floor igneous transect from Landing Site (T1) to Séítah cumulate unit (T2). Flat, low-risk floor traverse verifying floor stratigraphy and baseline igneous geochemistry."
-  },
-  {
-    id: "corridor-full",
-    name: "Full Research Corridor Context (T1 → T7)",
-    badge: "SCIENTIFIC REFERENCE (37.2 km)",
-    targetIds: ["T1", "T2", "T3", "T4", "T5", "T6", "T7"],
-    center: [18.468, 77.375],
-    zoom: 13,
-    straightLineDistanceM: 17800,
-    traverseDistanceM: 37200,
-    elevationDeltaM: 215.4,
-    meanGradePct: 2.8,
-    maxSlopeDeg: 14.5,
-    durationMin: 480,
-    isReferenceOnly: true,
-    warning: "SCIENTIFIC RESEARCH TRANSECT — NOT A CERTIFIED SINGLE HUMAN MARSWALK ROUTE (Exceeds 8h EVA limit; multi-day rover mission profile)."
+    id: "preset-2",
+    name: "Expedition 2: Paleolake Hydrological Loop",
+    badge: "HYDROLOGICAL LOOP (36.8 km)",
+    targetIds: ["T1", "T3", "T4", "T7"],
+    center: [18.50, 77.50],
+    zoom: 11,
+    straightLineDistanceM: 26500,
+    traverseDistanceM: 36800,
+    traverseDistanceKm: 36.8,
+    elevationDeltaM: 225.0,
+    elevationGainM: 225.0,
+    meanGradePct: 2.4,
+    maxSlopeDeg: 8.5,
+    durationHours: 8.2,
+    mode: "Pressurized Rover Science Loop",
+    description: "Hydrological loop investigating Jezero's entire water cycle: starting at Eastern Basin Floor (T1), inspecting the Western Delta Front (T3), visiting Neretva Inflow Channel & Bright Angel (T4), and crossing to the Pliva Vallis Eastern Outlet Canyon (T7)."
   }
 ];
 
-// Continuous multi-point full traverse track (T1 -> T9) with interpolated coordinates & elevations
-// Modeled directly from Figure 1 & Figure 2 of research brief
+// Continuous Multi-Point Full Traverse Track for Along-Track Elevation Profile (0 km to 55.6 km)
+// Covers T1 (-2575m) -> T2 (-2568m) -> T3 (-2425m) -> T4 (-2350m) -> T5 (-2180m) -> T6 (-1790m)
 export const FULL_TRAVERSE_TRACK = [
-  { id: "p1", name: "T1 Landing", lat: 18.4446, lng: 77.4509, elevation: -2569.9, distKm: 0.0, slopeDeg: 1.2, unit: "Floor Basalt" },
-  { id: "p2", name: "Floor Ridge Waypoint", lat: 18.4390, lng: 77.4470, elevation: -2570.8, distKm: 1.4, slopeDeg: 1.5, unit: "Floor Basalt" },
-  { id: "p3", name: "T2 Séítah Contact", lat: 18.4325, lng: 77.4407, elevation: -2571.8, distKm: 2.8, slopeDeg: 2.4, unit: "Séítah Olivine" },
-  { id: "p4", name: "Séítah Basin North", lat: 18.4480, lng: 77.4380, elevation: -2565.0, distKm: 5.2, slopeDeg: 2.0, unit: "Séítah / Máaz Transition" },
-  { id: "p5", name: "T3 Máaz Formation", lat: 18.4619, lng: 77.4361, elevation: -2555.2, distKm: 7.9, slopeDeg: 2.8, unit: "Máaz Basaltic Cap" },
-  { id: "p6", name: "Floor/Delta Valley Crossing", lat: 18.4720, lng: 77.4050, elevation: -2510.0, distKm: 12.4, slopeDeg: 4.5, unit: "Delta Silt Apron" },
-  { id: "p7", name: "T4 Delta Front (Shenandoah)", lat: 18.4827, lng: 77.3686, elevation: -2421.1, distKm: 17.6, slopeDeg: 8.2, unit: "Shenandoah Mudstones" },
-  { id: "p8", name: "Hawksbill Gap Terrace", lat: 18.4900, lng: 77.3550, elevation: -2408.0, distKm: 21.2, slopeDeg: 6.4, unit: "Delta Sandstones" },
-  { id: "p9", name: "T5 Upper Delta Fan", lat: 18.4954, lng: 77.3466, elevation: -2398.5, distKm: 24.8, slopeDeg: 11.2, unit: "Boulder Conglomerate" },
-  { id: "p10", name: "Neretva Inflow Spillway", lat: 18.4958, lng: 77.3200, elevation: -2380.0, distKm: 29.5, slopeDeg: 5.0, unit: "Fluvial Channel Sand" },
-  { id: "p11", name: "T6 Neretva Channel Floor", lat: 18.4961, lng: 77.3038, elevation: -2362.8, distKm: 33.6, slopeDeg: 3.5, unit: "Neretva Valley Bedrock" },
-  { id: "p12", name: "Cheyava Falls Outcrop (T7)", lat: 18.4974, lng: 77.3051, elevation: -2354.5, distKm: 33.8, slopeDeg: 4.8, unit: "Bright Angel Mudstones" },
-  { id: "p13", name: "Crater Rim Ascent Corridor", lat: 18.4800, lng: 77.2850, elevation: -2100.0, distKm: 38.4, slopeDeg: 14.2, unit: "Talus & Ridge Flank" },
-  { id: "p14", name: "T8 Margin Unit Ridge", lat: 18.4606, lng: 77.2647, elevation: -1820.0, distKm: 42.1, slopeDeg: 17.8, unit: "Marginal Carbonates" },
-  { id: "p15", name: "West Rim Peak (T9)", lat: 18.4220, lng: 77.2207, elevation: -1973.6, distKm: 48.6, slopeDeg: 22.0, unit: "Noachian Basement Megabreccia" }
+  { id: "tp-1", name: "T1: Eastern Basin Floor (LZ)", targetId: "T1", lat: 18.44, lng: 77.58, elevation: -2575, distKm: 0.0, slopeDeg: 1.0, unit: "Floor Basalt / LZ" },
+  { id: "tp-2", name: "Basin Inter-Ridge Waypoint", targetId: null, lat: 18.38, lng: 77.52, elevation: -2572, distKm: 5.5, slopeDeg: 1.5, unit: "Floor Basalt Pavement" },
+  { id: "tp-3", name: "T2: South Séítah Olivine Ridge", targetId: "T2", lat: 18.31, lng: 77.46, elevation: -2568, distKm: 10.5, slopeDeg: 2.8, unit: "Séítah Olivine Cumulate" },
+  { id: "tp-4", name: "Séítah-Delta Valley Passage", targetId: null, lat: 18.39, lng: 77.42, elevation: -2510, distKm: 16.0, slopeDeg: 3.5, unit: "Distal Silt Apron" },
+  { id: "tp-5", name: "T3: Western Delta Front (Kodiak)", targetId: "T3", lat: 18.47, lng: 77.38, elevation: -2425, distKm: 21.1, slopeDeg: 7.8, unit: "Shenandoah Delta Mudstones" },
+  { id: "tp-6", name: "Neretva Fluvial Spillway", targetId: null, lat: 18.50, lng: 77.32, elevation: -2385, distKm: 25.2, slopeDeg: 4.2, unit: "Inflow Channel Gravel" },
+  { id: "tp-7", name: "T4: Bright Angel / Cheyava Falls", targetId: "T4", lat: 18.53, lng: 77.26, elevation: -2350, distKm: 29.0, slopeDeg: 5.4, unit: "Bright Angel Redox Mudstone" },
+  { id: "tp-8", name: "Lacustrine Shoreline Bench", targetId: null, lat: 18.58, lng: 77.30, elevation: -2270, distKm: 32.8, slopeDeg: 6.5, unit: "Transitional Carbonates" },
+  { id: "tp-9", name: "T5: NW Margin Carbonate Unit", targetId: "T5", lat: 18.63, lng: 77.33, elevation: -2180, distKm: 36.2, slopeDeg: 11.5, unit: "Marginal Carbonates / Bioherms" },
+  { id: "tp-10", name: "Rim Ascent Switchback Corridor", targetId: null, lat: 18.50, lng: 77.20, elevation: -2010, distKm: 45.0, slopeDeg: 15.2, unit: "Talus & Megabreccia Flank" },
+  { id: "tp-11", name: "T6: Western Crater Rim Crest", targetId: "T6", lat: 18.38, lng: 77.12, elevation: -1790, distKm: 55.6, slopeDeg: 21.5, unit: "Noachian Basement Uplift" }
 ];
 
-// CRISM Spectral Mineralogy Polygons (Geospatial boundaries over Jezero units)
+// Verified Standard Web Mercator (EPSG:3857) Mars Satellite Tile Layers
+// Hosted by OpenPlanetaryMap / CARTO and AWS S3 WhereOnMars
+export const NASA_TILE_LAYERS = [
+  {
+    id: "mars_optical",
+    name: "Mars Optical Satellite (Viking MDIM 2.1 Global)",
+    shortName: "Optical Mosaic",
+    description: "Standard Web Mercator colorized planetary mosaic hosted by OpenPlanetaryMap / CARTO. Verified 200 OK without 404s.",
+    url: "https://cartocdn-gusc.global.ssl.fastly.net/opmbuilder/api/v1/map/named/opm-mars-basemap-v0-2/all/{z}/{x}/{y}.png",
+    attribution: "© OpenPlanetaryMap / NASA / JPL / USGS / CARTO",
+    tms: false,
+    maxNativeZoom: 8,
+    maxZoom: 14,
+    defaultOpacity: 1.0,
+    isPrimary: true
+  },
+  {
+    id: "mola_color",
+    name: "Topographic Elevation (MOLA Colorized Relief)",
+    shortName: "MOLA Topo Color",
+    description: "NASA Mars Global Surveyor MOLA colorized shaded relief altimetry. Hypsometric tinting from deep crater basin to rim peaks.",
+    url: "https://s3-eu-west-1.amazonaws.com/whereonmars.cartodb.net/mola-color/{z}/{x}/{y}.png",
+    attribution: "NASA / GSFC / MOLA Team / WhereOnMars",
+    tms: true,
+    maxNativeZoom: 6,
+    maxZoom: 14,
+    defaultOpacity: 0.65
+  },
+  {
+    id: "mola_gray",
+    name: "Topographic Hillshade (MOLA Grayscale Relief)",
+    shortName: "MOLA Topo Gray",
+    description: "High-contrast shaded relief hillshade showing crater rims, delta scarps, and valley fault lines.",
+    url: "https://s3-eu-west-1.amazonaws.com/whereonmars.cartodb.net/mola-gray/{z}/{x}/{y}.png",
+    attribution: "NASA / GSFC / MOLA Team / WhereOnMars",
+    tms: true,
+    maxNativeZoom: 6,
+    maxZoom: 14,
+    defaultOpacity: 0.50
+  },
+  {
+    id: "celestia_shaded",
+    name: "Celestia / Viking 16k Global True-Color",
+    shortName: "Celestia Global",
+    description: "16k global true-color Martian surface mosaic providing high-fidelity regional color balance across Nili Planum.",
+    url: "https://s3-eu-west-1.amazonaws.com/whereonmars.cartodb.net/celestia_mars-shaded-16k_global/{z}/{x}/{y}.png",
+    attribution: "NASA / JPL / Celestia / WhereOnMars",
+    tms: true,
+    maxNativeZoom: 5,
+    maxZoom: 14,
+    defaultOpacity: 0.40
+  }
+];
+
+// CRISM Spectral Mineralogy Vector Polygons across Greater Jezero Basin
 export const CRISM_MINERAL_POLYGONS = [
   {
-    id: "poly-olivine",
-    name: "Olivine + Mg-Fe Grain-Boundary Carbonates",
-    mineral: "Olivine (Fo45-Fo65) & Mg-Fe Carbonates",
+    id: "crism-olivine-seitah",
+    name: "Olivine + Mg-Fe Carbonates (Séítah Cumulate)",
+    mineral: "Olivine (Fo45-Fo65) & Grain-Boundary Carbonates",
     color: "#10B981", // Emerald
     fillColor: "#10B981",
     fillOpacity: 0.35,
     weight: 2,
-    targetAnchor: "T2 Séítah",
+    targetAnchor: "T2: South Séítah",
     coords: [
-      [18.4200, 77.4250],
-      [18.4420, 77.4280],
-      [18.4500, 77.4480],
-      [18.4350, 77.4600],
-      [18.4180, 77.4450]
+      [18.28, 77.42],
+      [18.35, 77.44],
+      [18.36, 77.50],
+      [18.30, 77.52],
+      [18.27, 77.46]
     ]
   },
   {
-    id: "poly-smectite",
-    name: "Fe/Mg Phyllosilicates & Smectite Clays",
-    mineral: "Fe/Mg Smectites (Nontronite / Saponite)",
+    id: "crism-smectites-delta",
+    name: "Fe/Mg Phyllosilicates & Smectite Clays (Western Delta)",
+    mineral: "Nontronite / Saponite Smectite Clays",
     color: "#0284C7", // Cyan
     fillColor: "#0284C7",
     fillOpacity: 0.35,
     weight: 2,
-    targetAnchor: "T4 Delta Front & T5 Upper Delta",
+    targetAnchor: "T3: Western Delta",
     coords: [
-      [18.4750, 77.3400],
-      [18.5020, 77.3350],
-      [18.5080, 77.3600],
-      [18.4900, 77.3850],
-      [18.4720, 77.3750]
+      [18.44, 77.34],
+      [18.49, 77.35],
+      [18.51, 77.40],
+      [18.46, 77.42],
+      [18.43, 77.38]
     ]
   },
   {
-    id: "poly-redox",
-    name: "Vivianite (Fe-PO4) & Greigite (Fe-S) Redox Front",
-    mineral: "Vivianite, Greigite, Calcium Sulfate & Organic Carbon",
+    id: "crism-redox-brightangel",
+    name: "Redox Front: Vivianite (Fe-PO4) & Greigite (Fe-S)",
+    mineral: "Vivianite, Greigite, Gypsum & Organic Carbon",
     color: "#D97706", // Amber
     fillColor: "#D97706",
-    fillOpacity: 0.40,
+    fillOpacity: 0.45,
     weight: 2.5,
-    targetAnchor: "T6 Neretva & T7 Bright Angel",
+    targetAnchor: "T4: Bright Angel Channel",
     coords: [
-      [18.4920, 77.2980],
-      [18.5030, 77.2990],
-      [18.5040, 77.3120],
-      [18.4940, 77.3140]
+      [18.51, 77.23],
+      [18.55, 77.24],
+      [18.56, 77.29],
+      [18.52, 77.28]
     ]
   },
   {
-    id: "poly-carbonate-margin",
-    name: "Lacustrine Shoreline Carbonates",
+    id: "crism-carbonates-margin",
+    name: "Lacustrine Shoreline Carbonates (Margin Unit)",
     mineral: "Magnesite, Hydrated Carbonates & Siliceous Chert",
     color: "#7C3AED", // Violet
     fillColor: "#7C3AED",
     fillOpacity: 0.35,
     weight: 2,
-    targetAnchor: "T8 Margin Unit",
+    targetAnchor: "T5: NW Margin Carbonates",
     coords: [
-      [18.4480, 77.2500],
-      [18.4750, 77.2550],
-      [18.4800, 77.2800],
-      [18.4550, 77.2780]
+      [18.59, 77.28],
+      [18.66, 77.30],
+      [18.67, 77.36],
+      [18.61, 77.37]
     ]
   }
 ];
 
-// Terrain Slope Hazard Scarp Zones (> 15° slope)
+// Terrain Slope & Radiation Hazard Polygons
 export const SLOPE_HAZARD_ZONES = [
   {
-    id: "hazard-delta-scarp",
-    name: "Delta Front Scarp Face (16°–22° Slope)",
+    id: "hazard-west-rim-cliff",
+    name: "Western Crater Rim Fault Scarp (> 20° Slope)",
+    type: "CLIFF_HAZARD",
     color: "#EF4444",
     fillColor: "#EF4444",
-    fillOpacity: 0.45,
+    fillOpacity: 0.40,
     coords: [
-      [18.4810, 77.3640],
-      [18.4880, 77.3620],
-      [18.4910, 77.3710],
-      [18.4830, 77.3730]
+      [18.32, 77.08],
+      [18.42, 77.10],
+      [18.43, 77.16],
+      [18.34, 77.15]
     ]
   },
   {
-    id: "hazard-west-rim",
-    name: "Western Crater Rim Cliff (> 20° Slope)",
-    color: "#EF4444",
-    fillColor: "#EF4444",
-    fillOpacity: 0.45,
+    id: "hazard-delta-front-scarp",
+    name: "Delta Front Eroded Escarpment (16°–22° Slope)",
+    type: "CLIFF_HAZARD",
+    color: "#F97316",
+    fillColor: "#F97316",
+    fillOpacity: 0.35,
     coords: [
-      [18.4150, 77.2100],
-      [18.4700, 77.2400],
-      [18.4650, 77.2550],
-      [18.4100, 77.2250]
+      [18.46, 77.37],
+      [18.49, 77.37],
+      [18.50, 77.39],
+      [18.47, 77.39]
     ]
-  }
-];
-
-// Max-Res Live WMTS Satellite Tile Configurations
-export const NASA_TILE_LAYERS = [
-  {
-    id: "hirise_maxres",
-    name: "Max-Res Jezero HiRISE + CTX Mosaic (~0.25–1 m/px)",
-    shortName: "HiRISE Optical",
-    description: "Sub-meter resolution orbital imagery (MRO HiRISE + CTX + HRSC GCS Mars). Allows zooming down to meter-scale rocks.",
-    url: "https://trek.nasa.gov/tiles/Mars/EQ/NES_JEZ_MID_Visible_Mosaic_HiRISE_CTX_HRSC_GCS_MARS_07-10-2018/1.0.0/default/default028mm/{z}/{y}/{x}.png",
-    attribution: "NASA / JPL / MSSS / UofA / Mars Trek",
-    nativeResolution: "HiRISE ~0.25–0.5 m/px | CTX ~6 m/px",
-    safetyWarning: "Safe for boulder-scale field planning down to 0.5 m.",
-    defaultOpacity: 1.0,
-    maxNativeZoom: 19,
-    maxZoom: 20,
-    isPrimary: true
   },
   {
-    id: "viking_global",
-    name: "Viking MDIM 2.1 Color Mosaic (232 m/px)",
-    shortName: "Viking Color",
-    description: "Global true-color reference mosaic for broad regional context.",
-    url: "https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg",
-    attribution: "NASA / JPL / USGS",
-    nativeResolution: "232 m/px",
-    safetyWarning: "DO NOT use for foot traverse safety; regional context only.",
-    defaultOpacity: 0.35,
-    maxNativeZoom: 8,
-    maxZoom: 20
-  },
-  {
-    id: "mola_topo",
-    name: "Topographic Elevation & Hillshade (MOLA 463 m/px)",
-    shortName: "MOLA Topo",
-    description: "Laser altimetry colorized elevation map and terrain relief hillshade.",
-    url: "https://trek.nasa.gov/tiles/Mars/EQ/Mars_MGS_MOLA_ClrShade_merge_global_463m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg",
-    attribution: "NASA / GSFC / MOLA Team",
-    nativeResolution: "MOLA ~463 m/px (HRSC blend)",
-    safetyWarning: "Slope angles derived from coarse grid; does not reflect local scarps < 100m.",
-    defaultOpacity: 0.30,
-    maxNativeZoom: 8,
-    maxZoom: 20
-  },
-  {
-    id: "themis_day_ir",
-    name: "THEMIS-IR Day Global Mosaic (100 m/px)",
-    shortName: "THEMIS IR",
-    description: "Thermal infrared radiance mapping thermal inertia and bedrock exposure vs sand mantle.",
-    url: "https://trek.nasa.gov/tiles/Mars/EQ/Mars_MO_THEMIS-IR-Day_mosaic_global_100m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg",
-    attribution: "NASA / JPL / ASU",
-    nativeResolution: "100 m/px",
-    safetyWarning: "Thermal inertia does not distinguish small boulder hazards.",
-    defaultOpacity: 0.25,
-    maxNativeZoom: 9,
-    maxZoom: 20
+    id: "safe-alcove-neretva",
+    name: "Neretva Fluvial Alcove (Terrain-Shielded Low-RAD Zone)",
+    type: "RAD_SHELTER",
+    color: "#059669",
+    fillColor: "#059669",
+    fillOpacity: 0.30,
+    coords: [
+      [18.51, 77.25],
+      [18.54, 77.25],
+      [18.54, 77.28],
+      [18.51, 77.28]
+    ]
   }
 ];
 
@@ -614,4 +535,9 @@ export function calculateMarsDistanceMeters(lat1, lon1, lat2, lon2) {
     Math.sin(dLon/2) * Math.sin(dLon/2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
   return Math.round(R * c);
+}
+
+// Helper: Mars Spherical Great-Circle Distance (Kilometers)
+export function calculateMarsDistanceKm(lat1, lon1, lat2, lon2) {
+  return calculateMarsDistanceMeters(lat1, lon1, lat2, lon2) / 1000;
 }

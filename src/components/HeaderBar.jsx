@@ -56,11 +56,11 @@ export default function HeaderBar({
           </span>
           <span className="text-slate-300 hidden sm:inline">|</span>
           <span className="hidden md:inline text-slate-700">
-            JEZERO CRATER: <strong>18.47°N, 77.37°E</strong> (PLANETOCENTRIC)
+            GREATER JEZERO BASIN: <strong>18.45°N, 77.40°E</strong> (PLANETOCENTRIC)
           </span>
           <span className="text-slate-300 hidden lg:inline">|</span>
           <span className="hidden lg:inline text-slate-600">
-            HiRISE MAX RES: <strong className="text-emerald-700">~0.25–1.0 m/px</strong>
+            REGIONAL SCALE: <strong className="text-emerald-700">45 km Footprint (EPSG:3857)</strong>
           </span>
         </div>
 
@@ -96,62 +96,62 @@ export default function HeaderBar({
                 {MISSION_HEADER.title}
               </h1>
               <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-300">
-                HiRISE 0.25m
+                Web Mercator
               </span>
             </div>
-            <p className="text-xs text-slate-500 font-sans">
-              Editorial Planetary Science & Astronaut EVA Traverse Planning Platform
+            <p className="text-xs text-slate-500 font-sans hidden sm:block">
+              {MISSION_HEADER.subtitle}
             </p>
           </div>
         </div>
 
-        {/* Targets T1-T9 Horizontal Scroller */}
-        <div className="hidden xl:flex items-center p-1 bg-slate-100 rounded-lg border border-slate-200 text-xs font-mono">
-          <span className="px-2 text-slate-400 text-[10px] font-bold uppercase">Targets:</span>
-          {VERIFIED_TARGETS.map(t => (
-            <button
-              key={t.id}
-              onClick={() => onSelectTarget(t.id)}
-              className={`px-2 py-1 rounded text-xs transition-all ${
-                activeTargetId === t.id
-                  ? 'bg-white text-slate-900 font-bold shadow-subtle border border-slate-200'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              {t.num} {t.shortName.split(' ')[0]}
-            </button>
-          ))}
+        {/* Target Quick Jumper Pills (T1 - T7) */}
+        <div className="flex items-center space-x-1 overflow-x-auto py-1">
+          <span className="text-[11px] font-mono text-slate-400 mr-1.5 hidden xl:inline">TARGETS:</span>
+          {VERIFIED_TARGETS.map(target => {
+            const isSelected = activeTargetId === target.id;
+            const isPrimary = target.isPrimaryTarget;
+            return (
+              <button
+                key={target.id}
+                onClick={() => onSelectTarget(target.id)}
+                title={`${target.name} (${target.elevation}m)`}
+                className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-all duration-150 flex items-center space-x-1 shrink-0 ${
+                  isSelected
+                    ? (isPrimary 
+                        ? 'bg-amber-500 text-slate-950 border border-amber-600 shadow-sm' 
+                        : 'bg-slate-900 text-white border border-slate-900 shadow-sm')
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300'
+                }`}
+              >
+                <span>{target.num}</span>
+                {isPrimary && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-950 animate-ping"></span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Right Action: Simulate SEP Radiation Event */}
-        <div className="flex items-center space-x-2.5">
-          {!sepAlertActive ? (
+        {/* Right Action: Solar Particle Alarm Simulation Button */}
+        <div className="flex items-center space-x-2">
+          {sepAlertActive ? (
             <button
-              onClick={onTriggerSepAlert}
-              className="px-3 py-1.5 rounded-lg bg-terracotta-50 hover:bg-terracotta-100 border border-terracotta-300 text-terracotta-800 text-xs font-mono font-bold flex items-center space-x-1.5 shadow-subtle transition-all"
+              onClick={onResetSepAlert}
+              className="px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700 font-mono font-bold text-xs flex items-center space-x-1.5 shadow-sm animate-pulse"
             >
-              <Zap className="w-3.5 h-3.5 text-terracotta-600" />
-              <span>SIMULATE SEP ALERT</span>
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>SILENCE ALARM</span>
             </button>
           ) : (
             <button
-              onClick={onResetSepAlert}
-              className="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-bold flex items-center space-x-1.5 shadow-sm transition-all"
+              onClick={onTriggerSepAlert}
+              className="px-3 py-1.5 rounded-lg border border-red-300 bg-red-50 text-red-700 hover:bg-red-100 font-mono font-bold text-xs flex items-center space-x-1.5 transition-colors shadow-subtle"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>CLEAR SEP STORM</span>
+              <Zap className="w-3.5 h-3.5 text-red-600" />
+              <span>TEST SEP ALARM</span>
             </button>
           )}
-
-          {/* Radiation Status Pill */}
-          <div className={`px-2.5 py-1.5 rounded-lg border text-xs font-mono font-semibold flex items-center space-x-1.5 ${
-            sepAlertActive
-              ? 'bg-red-50 border-red-300 text-red-800 animate-pulse'
-              : 'bg-slate-50 border-slate-200 text-slate-700'
-          }`}>
-            <ShieldAlert className={`w-3.5 h-3.5 ${sepAlertActive ? 'text-red-600' : 'text-emerald-600'}`} />
-            <span>RAD: {sepAlertActive ? '48.5 mSv/h [CRITICAL]' : '0.64 mSv/d [NOMINAL]'}</span>
-          </div>
         </div>
       </div>
     </header>

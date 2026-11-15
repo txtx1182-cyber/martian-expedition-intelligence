@@ -5,8 +5,6 @@ import {
   Compass, 
   Sliders, 
   MapPin, 
-  Footprints, 
-  ShieldAlert, 
   Clock, 
   Plus, 
   Trash2, 
@@ -17,43 +15,44 @@ import {
   Activity,
   ArrowRight,
   Sun,
-  Eye,
-  Flame,
-  Mountain
+  ShieldCheck,
+  Truck,
+  Footprints,
+  Maximize2
 } from 'lucide-react';
 import { 
   NASA_TILE_LAYERS, 
   PRESET_SORTIES, 
   VERIFIED_TARGETS, 
   MARS_CONSTANTS,
-  calculateMarsDistanceMeters 
+  calculateMarsDistanceKm 
 } from '../data/marsDossierData';
 
 export default function TraversePlannerDrawer({
   activeMapMode,
   onSelectMapMode,
-  layerOpacities,
+  layerOpacities = {},
   onOpacityChange,
   activeSortieId,
   onSelectSortie,
   activeTargetId,
   onSelectTarget,
-  customWaypoints,
+  customWaypoints = [],
   onClearCustomWaypoints,
   isPlacingWaypoint,
   onTogglePlaceWaypoint,
   onOpenEnvHonestyModal
 }) {
-  const [activeTab, setActiveTab] = useState('SORTIES'); // 'SORTIES', 'LAYERS', 'CUSTOM_BUILDER'
-  const [astronautSpeed, setAstronautSpeed] = useState(0.85); // m/s (~3.06 km/h)
+  const [activeTab, setActiveTab] = useState('EXPEDITIONS'); // 'EXPEDITIONS', 'LAYERS', 'CUSTOM_BUILDER'
+  const [roverSpeedKmH, setRoverSpeedKmH] = useState(8.0); // km/h for pressurized rover
 
   const activeSortie = PRESET_SORTIES.find(s => s.id === activeSortieId) || PRESET_SORTIES[0];
 
   // Calculate cumulative custom waypoint distance
-  let customTotalDistMeters = 0;
+  let customTotalDistKm = 0;
   if (customWaypoints.length >= 2) {
     for (let i = 0; i < customWaypoints.length - 1; i++) {
-      customTotalDistMeters += calculateMarsDistanceMeters(
+      customTotalDistKm += calculateMarsDistanceKm(
         customWaypoints[i].lat,
         customWaypoints[i].lng,
         customWaypoints[i + 1].lat,
@@ -62,338 +61,262 @@ export default function TraversePlannerDrawer({
     }
   }
 
-  // 5 Multi-Domain Planetary Map Modes
+  const customDriveHours = roverSpeedKmH > 0 ? (customTotalDistKm / roverSpeedKmH).toFixed(1) : 0;
+  const customBatteryKWh = (customTotalDistKm * 0.42).toFixed(1); // ~0.42 kWh/km for pressurized rover
+  const customO2Kg = ((customTotalDistKm / roverSpeedKmH) * 0.084).toFixed(2); // 84g O2 per astronaut-hour
+
+  // Planetary Map Modes
   const MAP_MODES = [
     {
       id: 'OPTICAL',
-      name: '1. HiRISE / CTX Optical',
-      tag: 'Visible 0.25m',
-      desc: 'Ochre bedrock, dark basalt floor, & Bright Angel tan mudstone outcrops'
-    },
-    {
-      id: 'THEMIS_IR',
-      name: '2. THEMIS Thermal Infrared',
-      tag: 'Thermal Inertia',
-      desc: 'False-color heatmap: cold eolian dust vs warm high-thermal-inertia bedrock'
+      name: '1. Mars Optical Satellite',
+      tag: 'Viking MDIM 2.1',
+      desc: 'Standard global color mosaic hosted on CARTO / OpenPlanetaryMap'
     },
     {
       id: 'MOLA_ELEVATION',
-      name: '3. MOLA Hypsometric Elevation',
-      tag: '-2586m to -1820m',
-      desc: 'Figure 1 color ramp: Deep Cobalt Blue (floor) to Crimson (rim peaks)'
+      name: '2. MOLA Colorized Elevation',
+      tag: 'Laser Altimeter',
+      desc: 'Color-coded hypsometric elevation tinting from -2600m to -1750m'
     },
     {
-      id: 'CRISM_SPECTRAL',
-      name: '4. CRISM Spectral Mineralogy',
-      tag: 'Mineral Facies',
-      desc: 'Translucent polygons: Olivine, Smectite Clays, Vivianite/Greigite, & Carbonates'
+      id: 'MOLA_GRAY',
+      name: '3. MOLA Shaded Relief',
+      tag: 'Hillshade',
+      desc: 'High-contrast grayscale hillshade highlighting crater rims & scarps'
     },
     {
-      id: 'HAZARDS',
-      name: '5. Slope & Radiation Hazards',
-      tag: '>15° Scarp Alert',
-      desc: 'Red hatched impassable cliff faces & emerald terrain-shielded low-dose alcoves'
+      id: 'CELESTIA',
+      name: '4. Celestia 16k True-Color',
+      tag: '16k Global',
+      desc: 'Vivid Mars color balance across Greater Jezero & Nili Planum'
     }
   ];
 
   return (
     <aside className="w-[320px] h-full flex flex-col bg-white border-r border-slate-300 shadow-panel z-20 overflow-hidden select-none">
-      {/* Sleek Sub-Header (No duplicate header text) */}
-      <div className="p-3 border-b border-slate-200 bg-slate-50">
-        <div className="flex items-center justify-between text-xs font-mono font-bold text-slate-800 uppercase tracking-wider mb-2">
-          <span className="flex items-center space-x-1.5">
-            <Compass className="w-4 h-4 text-terracotta-700" />
-            <span>TRAVERSE & PLANETARY LAYERS</span>
-          </span>
-          <span className="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-            ONLINE
-          </span>
-        </div>
+      {/* Drawer Header Tabs */}
+      <div className="flex border-b border-slate-200 bg-slate-50 text-xs font-mono font-bold">
+        <button
+          onClick={() => setActiveTab('EXPEDITIONS')}
+          className={`flex-1 py-2.5 px-2 flex items-center justify-center space-x-1.5 border-b-2 transition-colors ${
+            activeTab === 'EXPEDITIONS'
+              ? 'border-terracotta-700 text-terracotta-800 bg-white'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          <Truck className="w-3.5 h-3.5" />
+          <span>EXPEDITIONS</span>
+        </button>
 
-        {/* 3 Workspace Tabs */}
-        <div className="grid grid-cols-3 gap-1 p-0.5 bg-slate-200/80 rounded-lg text-xs font-mono">
-          <button
-            onClick={() => setActiveTab('SORTIES')}
-            className={`py-1 rounded text-center font-bold transition-all ${
-              activeTab === 'SORTIES' ? 'bg-white text-slate-900 shadow-subtle' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            SORTIES
-          </button>
-          <button
-            onClick={() => setActiveTab('CUSTOM_BUILDER')}
-            className={`py-1 rounded text-center font-bold transition-all ${
-              activeTab === 'CUSTOM_BUILDER' ? 'bg-white text-slate-900 shadow-subtle' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            BUILD EVA
-          </button>
-          <button
-            onClick={() => setActiveTab('LAYERS')}
-            className={`py-1 rounded text-center font-bold transition-all ${
-              activeTab === 'LAYERS' ? 'bg-white text-slate-900 shadow-subtle' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            LAYERS
-          </button>
-        </div>
+        <button
+          onClick={() => setActiveTab('LAYERS')}
+          className={`flex-1 py-2.5 px-2 flex items-center justify-center space-x-1.5 border-b-2 transition-colors ${
+            activeTab === 'LAYERS'
+              ? 'border-terracotta-700 text-terracotta-800 bg-white'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          <Layers className="w-3.5 h-3.5" />
+          <span>LAYERS</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('CUSTOM_BUILDER')}
+          className={`flex-1 py-2.5 px-2 flex items-center justify-center space-x-1.5 border-b-2 transition-colors ${
+            activeTab === 'CUSTOM_BUILDER'
+              ? 'border-terracotta-700 text-terracotta-800 bg-white'
+              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          <Navigation className="w-3.5 h-3.5" />
+          <span>ROUTER</span>
+        </button>
       </div>
 
       {/* Main Drawer Scroll Area */}
-      <div className="flex-1 overflow-y-auto p-3.5 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* ======================================================== */}
-        {/* TAB 1: PRESET LOCAL EVA SORTIES (METER-SCALE FOCUS)       */}
+        {/* TAB 1: PRESET KILOMETER-SCALE EXPEDITIONS                 */}
         {/* ======================================================== */}
-        {activeTab === 'SORTIES' && (
-          <div className="space-y-3.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-display font-bold uppercase tracking-wider text-slate-800 flex items-center space-x-1.5">
-                <Footprints className="w-4 h-4 text-terracotta-700" />
-                <span>Preset Local EVA Sorties</span>
-              </span>
-              <span className="font-mono text-[10px] text-slate-400">HiRISE Focus</span>
+        {activeTab === 'EXPEDITIONS' && (
+          <div className="space-y-4">
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-display font-bold uppercase tracking-wider text-slate-800 flex items-center space-x-1.5">
+                  <Compass className="w-4 h-4 text-terracotta-700" />
+                  <span>Kilometer-Scale Expeditions</span>
+                </span>
+                <span className="text-[10px] font-mono text-slate-500">Pressurized Rover</span>
+              </div>
+              <p className="text-[11px] text-slate-600 font-sans leading-relaxed">
+                Standard Web Mercator regional sorties across the ~45 km Greater Jezero Crater basin.
+              </p>
             </div>
 
-            <div className="space-y-2.5">
+            {/* Expedition Selector Cards */}
+            <div className="space-y-3">
               {PRESET_SORTIES.map((sortie) => {
-                const isSelected = activeSortieId === sortie.id && customWaypoints.length === 0;
-
+                const isSelected = activeSortieId === sortie.id;
                 return (
                   <div
                     key={sortie.id}
                     onClick={() => onSelectSortie(sortie.id)}
-                    className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                    className={`p-3 rounded-xl border text-left cursor-pointer transition-all duration-150 ${
                       isSelected
-                        ? 'bg-slate-900 text-white border-slate-900 shadow-md ring-1 ring-terracotta-600'
-                        : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-800'
+                        ? 'border-terracotta-700 bg-terracotta-50/50 shadow-subtle ring-1 ring-terracotta-700'
+                        : 'border-slate-200 bg-white hover:border-slate-400 hover:bg-slate-50'
                     }`}
                   >
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold ${
-                          sortie.isReferenceOnly
-                            ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                            : isSelected
-                            ? 'bg-terracotta-700 text-white'
-                            : 'bg-slate-100 text-slate-700'
-                        }`}>
-                          {sortie.badge}
-                        </span>
-                        {isSelected && (
-                          <span className="text-[10px] font-mono text-emerald-400 font-bold">
-                            ✓ ACTIVE
-                          </span>
-                        )}
-                      </div>
-
-                      <h3 className="text-xs font-display font-bold mt-1">
-                        {sortie.name}
-                      </h3>
-                      <p className={`text-[11px] font-sans leading-relaxed mt-1 ${isSelected ? 'text-slate-300' : 'text-slate-600'}`}>
-                        {sortie.description}
-                      </p>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-900 text-white">
+                        {sortie.badge}
+                      </span>
+                      <span className="text-xs font-mono font-bold text-terracotta-700">
+                        {sortie.traverseDistanceKm} km
+                      </span>
                     </div>
 
-                    {/* Sortie Telemetry Grid */}
-                    <div className="grid grid-cols-3 gap-1.5 pt-2 mt-2 border-t border-slate-200/30 text-[10px] font-mono">
-                      <div className={`p-1.5 rounded ${isSelected ? 'bg-slate-800 text-slate-200' : 'bg-slate-100 text-slate-700'}`}>
-                        <span className="block text-[8.5px] opacity-70">DISTANCE</span>
-                        <strong className="text-xs">
-                          {sortie.traverseDistanceM >= 1000 
-                            ? `${(sortie.traverseDistanceM / 1000).toFixed(1)} km` 
-                            : `${sortie.traverseDistanceM} m`}
-                        </strong>
+                    <h4 className="text-xs font-display font-bold text-slate-900 leading-snug">
+                      {sortie.name}
+                    </h4>
+
+                    <p className="text-[11px] text-slate-600 mt-1 line-clamp-2 leading-relaxed">
+                      {sortie.description}
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-slate-200/80 text-[10px] font-mono">
+                      <div>
+                        <span className="text-slate-400 block">CLIMB GAIN:</span>
+                        <strong className="text-slate-900">+{sortie.elevationGainM} m</strong>
                       </div>
-                      <div className={`p-1.5 rounded ${isSelected ? 'bg-slate-800 text-slate-200' : 'bg-slate-100 text-slate-700'}`}>
-                        <span className="block text-[8.5px] opacity-70">ELEV. Δz</span>
-                        <strong className="text-xs text-terracotta-500">
-                          {sortie.elevationDeltaM > 0 ? `+${sortie.elevationDeltaM}` : sortie.elevationDeltaM} m
-                        </strong>
-                      </div>
-                      <div className={`p-1.5 rounded ${isSelected ? 'bg-slate-800 text-slate-200' : 'bg-slate-100 text-slate-700'}`}>
-                        <span className="block text-[8.5px] opacity-70">EST. DURATION</span>
-                        <strong className="text-xs text-emerald-400">
-                          {sortie.durationMin} min
-                        </strong>
+                      <div>
+                        <span className="text-slate-400 block">DRIVE TIME:</span>
+                        <strong className="text-slate-900">~{sortie.durationHours} hrs</strong>
                       </div>
                     </div>
-
-                    {sortie.warning && (
-                      <div className="mt-2 p-1.5 rounded bg-amber-50 border border-amber-300 text-amber-900 text-[9.5px] font-mono leading-tight">
-                        <strong>NOTICE:</strong> {sortie.warning}
-                      </div>
-                    )}
                   </div>
                 );
               })}
             </div>
 
-            {/* Quick 9 Targets Jumper */}
-            <div className="pt-2 border-t border-slate-200 space-y-1.5">
-              <span className="text-[11px] font-mono font-bold text-slate-500 uppercase block">
-                Jump to Target (T1–T9)
+            {/* Active Expedition Target Waypoint Sequence */}
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <span className="text-xs font-display font-bold uppercase tracking-wider text-slate-800 flex items-center space-x-1.5">
+                <MapPin className="w-4 h-4 text-cobalt-700" />
+                <span>Expedition Waypoint Sequence</span>
               </span>
-              <div className="grid grid-cols-3 gap-1 text-[11px] font-mono">
-                {VERIFIED_TARGETS.map(t => (
-                  <button
-                    key={t.id}
-                    onClick={() => onSelectTarget(t.id)}
-                    className={`p-1 rounded text-center truncate border transition-all ${
-                      activeTargetId === t.id
-                        ? 'bg-slate-900 text-white font-bold border-slate-900'
-                        : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
-                    }`}
-                  >
-                    {t.num} {t.shortName.split(' ')[0]}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
 
-        {/* ======================================================== */}
-        {/* TAB 2: CUSTOM WAYPOINT-TO-WAYPOINT EVA BUILDER           */}
-        {/* ======================================================== */}
-        {activeTab === 'CUSTOM_BUILDER' && (
-          <div className="space-y-3.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-display font-bold uppercase tracking-wider text-slate-800 flex items-center space-x-1.5">
-                <Compass className="w-4 h-4 text-cobalt-700" />
-                <span>Meter-Scale EVA Builder</span>
-              </span>
-              <span className="font-mono text-[10px] text-slate-400">Custom Path</span>
-            </div>
-
-            <p className="text-[11px] text-slate-600 font-sans leading-relaxed">
-              Tap the button below and click anywhere on the <strong>HiRISE 0.25 m/px</strong> map to drop custom field waypoints.
-            </p>
-
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={onTogglePlaceWaypoint}
-                className={`flex-1 py-2 px-3 rounded-lg text-xs font-mono font-bold flex items-center justify-center space-x-1.5 transition-all shadow-subtle ${
-                  isPlacingWaypoint
-                    ? 'bg-cobalt-700 text-white animate-pulse'
-                    : 'bg-cobalt-50 text-cobalt-800 border border-cobalt-300 hover:bg-cobalt-100'
-                }`}
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>{isPlacingWaypoint ? 'CLICK MAP TO DROP POINT' : '+ ADD WAYPOINTS ON MAP'}</span>
-              </button>
-
-              {customWaypoints.length > 0 && (
-                <button
-                  onClick={onClearCustomWaypoints}
-                  className="p-2 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-700 border border-slate-300 transition-colors"
-                  title="Clear Waypoints"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
-            {customWaypoints.length > 0 ? (
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-slate-500">POINTS PLACED:</span>
-                  <span className="font-bold text-slate-900">{customWaypoints.length}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-slate-500">TOTAL TRAVERSE:</span>
-                  <span className="font-bold text-terracotta-700 text-sm">{customTotalDistMeters} m</span>
-                </div>
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-slate-500">EST. TIME (@ 0.85 m/s):</span>
-                  <span className="font-bold text-emerald-700">
-                    {Math.round(customTotalDistMeters / astronautSpeed / 60)} min
-                  </span>
-                </div>
-
-                <div className="pt-2 border-t border-slate-200 space-y-1 max-h-36 overflow-y-auto">
-                  {customWaypoints.map((wp, i) => (
-                    <div key={i} className="flex items-center justify-between text-[10px] font-mono p-1 rounded bg-white border border-slate-200">
-                      <span>WP-{i + 1}: {wp.lat.toFixed(4)}°N, {wp.lng.toFixed(4)}°E</span>
+              <div className="space-y-1.5">
+                {activeSortie.targetIds.map((tId, idx) => {
+                  const target = VERIFIED_TARGETS.find(t => t.id === tId);
+                  if (!target) return null;
+                  const isCurrent = activeTargetId === target.id;
+                  return (
+                    <div
+                      key={target.id}
+                      onClick={() => onSelectTarget(target.id)}
+                      className={`p-2 rounded-lg border text-xs flex items-center justify-between cursor-pointer transition-colors ${
+                        isCurrent
+                          ? 'bg-amber-50 border-amber-400 text-amber-950 font-bold'
+                          : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 truncate">
+                        <span className="w-5 h-5 rounded-full bg-slate-900 text-white font-mono text-[10px] flex items-center justify-center font-bold shrink-0">
+                          {idx + 1}
+                        </span>
+                        <span className="truncate">{target.shortName}</span>
+                      </div>
+                      <span className="text-[10px] font-mono text-terracotta-700 shrink-0 ml-2">
+                        {target.elevation}m
+                      </span>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
-            ) : (
-              <div className="p-4 rounded-xl border border-dashed border-slate-300 text-center text-xs font-mono text-slate-500">
-                No custom waypoints placed yet. Tap "+ ADD WAYPOINTS ON MAP" to plot.
+            </div>
+
+            {/* Planetary Coordinate Disclosure Pill */}
+            <div className="p-2.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-950 space-y-1">
+              <div className="flex items-center space-x-1 text-[10px] font-mono font-bold text-blue-800">
+                <Info className="w-3.5 h-3.5 shrink-0" />
+                <span>MARS 2000 PLANETOCENTRIC CRS</span>
               </div>
-            )}
+              <p className="text-[10px] text-blue-900 leading-tight">
+                All coordinates align to NASA PDS & MOLA IAU Mars 2000 Sphere (R=3,389.5 km). Note that planetodetic latitude carries a ~5.8 km latitudinal offset.
+              </p>
+            </div>
           </div>
         )}
 
         {/* ======================================================== */}
-        {/* TAB 3: 5 MULTI-DOMAIN PLANETARY MAP MODES & OPACITIES    */}
+        {/* TAB 2: VERIFIED WEB MERCATOR TILE LAYERS & OPACITIES     */}
         {/* ======================================================== */}
         {activeTab === 'LAYERS' && (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <span className="text-xs font-display font-bold uppercase tracking-wider text-slate-800 flex items-center space-x-1.5">
-                <Layers className="w-4 h-4 text-cobalt-700" />
-                <span>5 Planetary Map Modes</span>
+            <div>
+              <span className="text-xs font-display font-bold uppercase tracking-wider text-slate-800 flex items-center space-x-1.5 mb-1">
+                <Layers className="w-4 h-4 text-terracotta-700" />
+                <span>Verified Tile Engines (EPSG:3857)</span>
               </span>
-              <p className="text-[10px] text-slate-500">
-                Switch rendering mode on the live procedural canvas & satellite shader:
+              <p className="text-[11px] text-slate-600 font-sans leading-relaxed">
+                Real planetary XYZ tile services hosted by OpenPlanetaryMap / CARTO and AWS S3 WhereOnMars.
               </p>
+            </div>
 
-              <div className="space-y-1.5">
+            {/* Quick Map Mode Selector Buttons */}
+            <div className="space-y-2">
+              <span className="text-[11px] font-mono font-bold text-slate-700">Quick Basemap Mode:</span>
+              <div className="grid grid-cols-1 gap-1.5">
                 {MAP_MODES.map(mode => (
                   <button
                     key={mode.id}
                     onClick={() => onSelectMapMode(mode.id)}
-                    className={`w-full text-left p-2.5 rounded-lg border text-xs transition-all flex flex-col space-y-0.5 ${
+                    className={`p-2 rounded-lg border text-left transition-colors ${
                       activeMapMode === mode.id
-                        ? 'bg-slate-900 text-white border-slate-900 shadow-sm ring-1 ring-terracotta-600'
-                        : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200'
+                        ? 'border-terracotta-700 bg-terracotta-50 text-terracotta-900 font-bold shadow-subtle'
+                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <strong className="font-display font-bold">{mode.name}</strong>
-                      <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded ${
-                        activeMapMode === mode.id ? 'bg-terracotta-700 text-white' : 'bg-slate-100 text-slate-600'
-                      }`}>
+                      <span className="text-xs font-display">{mode.name}</span>
+                      <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-slate-100 text-slate-600 border border-slate-300">
                         {mode.tag}
                       </span>
                     </div>
-                    <p className={`text-[10px] leading-tight font-sans ${activeMapMode === mode.id ? 'text-slate-300' : 'text-slate-500'}`}>
-                      {mode.desc}
-                    </p>
+                    <div className="text-[10px] text-slate-500 font-sans mt-0.5">{mode.desc}</div>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Individual Tile Opacity Sliders */}
-            <div className="pt-2 border-t border-slate-200 space-y-2.5">
-              <span className="text-[11px] font-mono font-bold text-slate-700 uppercase block">
-                NASA Mars Trek Overlay Blending
+            {/* Independent Tile Layer Opacity Sliders */}
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <span className="text-xs font-display font-bold uppercase tracking-wider text-slate-800 flex items-center space-x-1.5">
+                <Sliders className="w-4 h-4 text-terracotta-700" />
+                <span>Multi-Domain Tile Opacities</span>
               </span>
 
               {NASA_TILE_LAYERS.map(layer => {
-                const opacity = layerOpacities[layer.id] ?? layer.defaultOpacity;
-                const pct = Math.round(opacity * 100);
-
+                const currentVal = layerOpacities[layer.id] ?? layer.defaultOpacity;
                 return (
-                  <div key={layer.id} className="p-2 rounded bg-slate-50 border border-slate-200 space-y-1">
-                    <div className="flex justify-between text-xs font-mono">
-                      <span className="font-bold text-slate-800">{layer.shortName}</span>
-                      <span className="text-terracotta-700 font-bold">{pct}%</span>
+                  <div key={layer.id} className="space-y-1">
+                    <div className="flex items-center justify-between text-[11px] font-mono">
+                      <span className="text-slate-800 font-medium">{layer.shortName}</span>
+                      <span className="text-terracotta-700 font-bold">{Math.round(currentVal * 100)}%</span>
                     </div>
                     <input
                       type="range"
                       min="0"
                       max="1"
                       step="0.05"
-                      value={opacity}
+                      value={currentVal}
                       onChange={(e) => onOpacityChange(layer.id, parseFloat(e.target.value))}
-                      className="w-full h-1.5 bg-slate-200 rounded appearance-none cursor-pointer"
+                      className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-terracotta-700"
                     />
-                    <div className="text-[9px] font-mono text-slate-400">
-                      Res: {layer.nativeResolution}
+                    <div className="text-[9px] text-slate-400 font-mono">
+                      {layer.tms ? 'TMS: true' : 'XYZ'} | native zoom ≤ {layer.maxNativeZoom}
                     </div>
                   </div>
                 );
@@ -402,18 +325,124 @@ export default function TraversePlannerDrawer({
           </div>
         )}
 
-        {/* Bottom Environmental Disclosure Button */}
-        <div className="pt-2 border-t border-slate-200">
-          <button
-            onClick={onOpenEnvHonestyModal}
-            className="w-full p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-mono font-bold flex items-center justify-between border border-slate-300 transition-colors"
-          >
-            <div className="flex items-center space-x-1.5">
-              <ShieldAlert className="w-4 h-4 text-emerald-700" />
-              <span>RAD / MEDA Honesty Audit</span>
+        {/* ======================================================== */}
+        {/* TAB 3: CUSTOM WAYPOINT ROUTE BUILDER                     */}
+        {/* ======================================================== */}
+        {activeTab === 'CUSTOM_BUILDER' && (
+          <div className="space-y-4">
+            <div>
+              <span className="text-xs font-display font-bold uppercase tracking-wider text-slate-800 flex items-center space-x-1.5 mb-1">
+                <Navigation className="w-4 h-4 text-terracotta-700" />
+                <span>Interactive Route Builder</span>
+              </span>
+              <p className="text-[11px] text-slate-600 font-sans leading-relaxed">
+                Click on the Mars map canvas to plot custom vehicular or astronaut foot traverses.
+              </p>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
-          </button>
+
+            {/* Toggle Placing Waypoints Button */}
+            <div className="space-y-2">
+              <button
+                onClick={onTogglePlaceWaypoint}
+                className={`w-full py-2.5 px-3 rounded-lg font-mono font-bold text-xs flex items-center justify-center space-x-2 transition-colors shadow-sm ${
+                  isPlacingWaypoint
+                    ? 'bg-amber-500 text-slate-950 border border-amber-600 animate-pulse'
+                    : 'bg-slate-900 text-white hover:bg-slate-800'
+                }`}
+              >
+                <Plus className="w-4 h-4" />
+                <span>{isPlacingWaypoint ? 'CLICK MAP TO PLACE WAYPOINTS' : 'START PLACING WAYPOINTS'}</span>
+              </button>
+
+              {customWaypoints.length > 0 && (
+                <button
+                  onClick={onClearCustomWaypoints}
+                  className="w-full py-1.5 px-3 rounded-lg border border-red-300 text-red-700 bg-red-50 hover:bg-red-100 font-mono text-xs flex items-center justify-center space-x-1.5 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>CLEAR ALL WAYPOINTS ({customWaypoints.length})</span>
+                </button>
+              )}
+            </div>
+
+            {/* Custom Telemetry Card */}
+            {customWaypoints.length >= 2 ? (
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
+                  <span className="text-xs font-display font-bold text-slate-900">Custom Route Telemetry</span>
+                  <span className="text-xs font-mono font-bold text-terracotta-700">
+                    {customTotalDistKm.toFixed(2)} km
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-slate-600">Rover Speed:</span>
+                    <span className="text-slate-900 font-bold">{roverSpeedKmH} km/h</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="2"
+                    max="18"
+                    step="0.5"
+                    value={roverSpeedKmH}
+                    onChange={(e) => setRoverSpeedKmH(parseFloat(e.target.value))}
+                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-terracotta-700"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                  <div className="p-2 rounded bg-white border border-slate-200">
+                    <span className="text-slate-400 block">DRIVE TIME:</span>
+                    <strong className="text-slate-900 font-bold">~{customDriveHours} hrs</strong>
+                  </div>
+                  <div className="p-2 rounded bg-white border border-slate-200">
+                    <span className="text-slate-400 block">BATTERY:</span>
+                    <strong className="text-slate-900 font-bold">{customBatteryKWh} kWh</strong>
+                  </div>
+                  <div className="p-2 rounded bg-white border border-slate-200">
+                    <span className="text-slate-400 block">CREW O2 COST:</span>
+                    <strong className="text-slate-900 font-bold">{customO2Kg} kg</strong>
+                  </div>
+                  <div className="p-2 rounded bg-white border border-slate-200">
+                    <span className="text-slate-400 block">STATUS:</span>
+                    <strong className="text-emerald-700 font-bold">FEASIBLE</strong>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 rounded-xl border border-dashed border-slate-300 text-center text-xs text-slate-500 font-sans">
+                Plot at least 2 points on the map to compute spherical Mars distance, drive hours, and battery consumption.
+              </div>
+            )}
+
+            {/* List of Placed Waypoints */}
+            {customWaypoints.length > 0 && (
+              <div className="space-y-1">
+                <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">Waypoints:</span>
+                <div className="max-h-[140px] overflow-y-auto space-y-1">
+                  {customWaypoints.map((wp, idx) => (
+                    <div key={idx} className="p-1.5 rounded bg-white border border-slate-200 text-[10px] font-mono flex items-center justify-between">
+                      <span className="font-bold text-slate-700">W{idx + 1}</span>
+                      <span className="text-slate-500">{wp.lat}°N, {wp.lng}°E</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Drawer Footer Telemetry */}
+      <div className="p-3 border-t border-slate-200 bg-slate-50/80 text-[11px] font-mono text-slate-600 space-y-1">
+        <div className="flex items-center justify-between">
+          <span>Active Target:</span>
+          <span className="font-bold text-terracotta-700">{activeTargetId || 'None'}</span>
+        </div>
+        <div className="flex items-center justify-between text-[10px] text-slate-500">
+          <span>Regional Scale:</span>
+          <span>45 km Basin Footprint</span>
         </div>
       </div>
     </aside>

@@ -53,11 +53,11 @@ export default function SepAlertBanner({ isActive, onDismiss, onNavigateToShelte
 
           <div className="flex items-center space-x-2 shrink-0">
             <button
-              onClick={() => onNavigateToShelter('target-02')}
+              onClick={() => onNavigateToShelter('T4')}
               className="px-3.5 py-2 rounded-lg bg-white text-red-700 hover:bg-red-50 text-xs font-mono font-bold flex items-center space-x-1.5 shadow-sm transition-all"
             >
               <Zap className="w-3.5 h-3.5 text-red-600" />
-              <span>NAV TO TARGET 02 SHELTER (68%)</span>
+              <span>NAV TO NERETVA ALCOVE SHELTER (T4)</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
             <button

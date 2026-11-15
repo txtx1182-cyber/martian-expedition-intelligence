@@ -10,16 +10,16 @@ export default function ElevationProfileDrawer({
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Chart coordinates calculation
-  // Total Distance: ~48.6 km
-  // Elevation Range: -2600 m (bottom) to -1800 m (top), range = 800 m
-  const chartWidth = 900;
-  const chartHeight = 120;
-  const paddingX = 40;
+  // Total Distance: ~55.6 km (Full Basin Rim-to-Floor Transect)
+  // Elevation Range: -2620 m (bottom) to -1750 m (top), range = 870 m
+  const chartWidth = 960;
+  const chartHeight = 125;
+  const paddingX = 45;
   const paddingY = 20;
 
-  const maxDist = 48.6;
+  const maxDist = 55.6;
   const minElev = -2620;
-  const maxElev = -1800;
+  const maxElev = -1750;
 
   const getX = (dist) => paddingX + (dist / maxDist) * (chartWidth - paddingX * 2);
   const getY = (elev) => chartHeight - paddingY - ((elev - minElev) / (maxElev - minElev)) * (chartHeight - paddingY * 2);
@@ -39,7 +39,9 @@ export default function ElevationProfileDrawer({
           <TrendingUp className="w-4 h-4 text-terracotta-700" />
           <strong className="font-display text-slate-900">ALONG-TRACK ELEVATION PROFILE</strong>
           <span className="text-slate-400">|</span>
-          <span className="text-[11px] text-slate-500">Figure 2 Profile (T1 Landing -2570m → T9 West Rim -1974m)</span>
+          <span className="text-[11px] text-slate-500">
+            Greater Jezero Basin Transect: T1 Landing (-2575m) → T6 West Rim (-1790m) [55.6 km]
+          </span>
         </div>
 
         <div className="flex items-center space-x-3 text-[11px] text-slate-600">
@@ -58,15 +60,15 @@ export default function ElevationProfileDrawer({
       {/* Chart Canvas Area */}
       {!isCollapsed && (
         <div className="p-3 bg-white overflow-x-auto">
-          <div className="min-w-[750px] max-w-5xl mx-auto h-[130px] relative">
+          <div className="min-w-[800px] max-w-5xl mx-auto h-[130px] relative">
             <svg 
               viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
               className="w-full h-full overflow-visible"
             >
               <defs>
                 <linearGradient id="profileGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#C2410C" stopOpacity="0.35" />
-                  <stop offset="100%" stopColor="#1D4ED8" stopOpacity="0.08" />
+                  <stop offset="0%" stopColor="#C2410C" stopOpacity="0.30" />
+                  <stop offset="100%" stopColor="#1D4ED8" stopOpacity="0.05" />
                 </linearGradient>
               </defs>
 
@@ -77,6 +79,17 @@ export default function ElevationProfileDrawer({
                   <g key={elev}>
                     <line x1={paddingX} y1={y} x2={chartWidth - paddingX} y2={y} stroke="#E2E8F0" strokeWidth="1" strokeDasharray="3 3" />
                     <text x={paddingX - 6} y={y + 3} textAnchor="end" fill="#94A3B8" fontSize="8.5" fontFamily="JetBrains Mono">{elev}m</text>
+                  </g>
+                );
+              })}
+
+              {/* Distance X-axis markers */}
+              {[0, 10, 20, 30, 40, 50, 55.6].map(dist => {
+                const x = getX(dist);
+                return (
+                  <g key={dist}>
+                    <line x1={x} y1={chartHeight - paddingY} x2={x} y2={chartHeight - paddingY + 4} stroke="#CBD5E1" strokeWidth="1" />
+                    <text x={x} y={chartHeight - paddingY + 12} textAnchor="middle" fill="#94A3B8" fontSize="8" fontFamily="JetBrains Mono">{dist}km</text>
                   </g>
                 );
               })}
@@ -98,73 +111,61 @@ export default function ElevationProfileDrawer({
               {FULL_TRAVERSE_TRACK.map((p, idx) => {
                 const cx = getX(p.distKm);
                 const cy = getY(p.elevation);
-                const isHovered = hoveredPoint?.id === p.id;
-                const isMajorTarget = p.name.startsWith('T');
+                const isHovered = hoveredPoint && hoveredPoint.id === p.id;
+                const isKeyTarget = Boolean(p.targetId);
 
                 return (
                   <g 
                     key={p.id}
+                    className="cursor-pointer group"
                     onMouseEnter={() => onHoverPoint(p)}
                     onMouseLeave={() => onHoverPoint(null)}
                     onClick={() => {
-                      const match = p.name.match(/T\d/);
-                      if (match && onSelectTarget) {
-                        onSelectTarget(match[0]);
+                      if (p.targetId && onSelectTarget) {
+                        onSelectTarget(p.targetId);
                       }
                     }}
-                    className="cursor-pointer group"
                   >
+                    {/* Vertical guideline */}
+                    <line
+                      x1={cx}
+                      y1={cy}
+                      x2={cx}
+                      y2={chartHeight - paddingY}
+                      stroke={isHovered ? "#C2410C" : "#E2E8F0"}
+                      strokeWidth={isHovered ? "1.5" : "0.75"}
+                      strokeDasharray={isHovered ? "none" : "2 2"}
+                    />
+
+                    {/* Point Circle */}
                     <circle
                       cx={cx}
                       cy={cy}
-                      r={isHovered ? 6 : isMajorTarget ? 4.5 : 2.5}
-                      fill={isMajorTarget ? '#0F172A' : '#64748B'}
+                      r={isHovered ? 5.5 : (isKeyTarget ? 4 : 2.5)}
+                      fill={isKeyTarget ? (p.targetId === 'T4' ? '#D97706' : '#C2410C') : '#0F172A'}
                       stroke="#FFFFFF"
-                      strokeWidth={1.5}
-                      className="transition-transform group-hover:scale-150"
+                      strokeWidth="1.5"
+                      className="transition-transform duration-150"
                     />
 
-                    {/* Target labels on chart for key waypoints */}
-                    {isMajorTarget && (
-                      <g transform={`translate(${cx}, ${cy - 10})`}>
-                        <text
-                          textAnchor="middle"
-                          fill="#0F172A"
-                          fontSize="8"
-                          fontFamily="Space Grotesk"
-                          fontWeight="bold"
-                        >
-                          {p.name.split(' ')[0]}
-                        </text>
-                      </g>
+                    {/* Target Label above point */}
+                    {isKeyTarget && (
+                      <text
+                        x={cx}
+                        y={cy - 8}
+                        textAnchor="middle"
+                        fill="#0F172A"
+                        fontSize="8.5"
+                        fontWeight="bold"
+                        fontFamily="JetBrains Mono"
+                      >
+                        {p.targetId}
+                      </text>
                     )}
                   </g>
                 );
               })}
-
-              {/* Hover Indicator Vertical Line */}
-              {hoveredPoint && (
-                <line
-                  x1={getX(hoveredPoint.distKm)}
-                  y1={paddingY}
-                  x2={getX(hoveredPoint.distKm)}
-                  y2={chartHeight - paddingY}
-                  stroke="#C2410C"
-                  strokeWidth="1.5"
-                  strokeDasharray="4 2"
-                />
-              )}
             </svg>
-
-            {/* X-Axis Distance Labels */}
-            <div className="flex justify-between px-10 text-[9px] font-mono text-slate-400 mt-0.5">
-              <span>0 km (Landing)</span>
-              <span>12 km (Delta Base)</span>
-              <span>24 km (Upper Fan)</span>
-              <span>33 km (Bright Angel)</span>
-              <span>42 km (Margin Unit)</span>
-              <span>48.6 km (West Rim)</span>
-            </div>
           </div>
         </div>
       )}
