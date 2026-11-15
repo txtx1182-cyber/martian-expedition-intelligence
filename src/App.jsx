@@ -1,28 +1,33 @@
 import React, { useState } from 'react';
 import HeaderBar from './components/HeaderBar';
-import LayerDrawer from './components/LayerDrawer';
+import TraversePlannerDrawer from './components/TraversePlannerDrawer';
 import MarsTrekMap from './components/MarsTrekMap';
-import TargetIntelligenceDrawer from './components/TargetIntelligenceDrawer';
+import TargetEvidenceCard from './components/TargetEvidenceCard';
 import SepAlertBanner from './components/SepAlertBanner';
-import { RESEARCH_TARGETS, MAP_LAYERS_CONFIG } from './data/marsDossierData';
+import EnvHonestyModal from './components/EnvHonestyModal';
+import { VERIFIED_TARGETS, PRESET_SORTIES } from './data/marsDossierData';
 
 export default function App() {
-  // Layer Opacities State
+  // Tile Layer Opacities
   const [layerOpacities, setLayerOpacities] = useState({
-    optical: 1.0,
-    jezero_ctx: 0.85,
-    themis_ir: 0.40,
-    mola_dem: 0.35,
+    hirise_maxres: 1.0,
+    viking_global: 0.35,
+    mola_topo: 0.30,
+    themis_day_ir: 0.25
   });
 
-  // Active Research Target (defaults to Target 04 Cheyava Falls)
-  const [activeTargetId, setActiveTargetId] = useState('target-04');
+  // Active Target ID (Default to T7 Bright Angel / Cheyava Falls)
+  const [activeTargetId, setActiveTargetId] = useState('T7');
 
-  // Corridor line toggle
-  const [showCorridor, setShowCorridor] = useState(true);
+  // Active Sortie ID (Default to Sortie 1: Neretva -> Bright Angel Micro-EVA ~170m)
+  const [activeSortieId, setActiveSortieId] = useState('sortie-1');
 
-  // Environmental / Space weather overlay toggle
-  const [showEnvOverlay, setShowEnvOverlay] = useState(true);
+  // Custom User Placed Waypoints
+  const [customWaypoints, setCustomWaypoints] = useState([]);
+  const [isPlacingWaypoint, setIsPlacingWaypoint] = useState(false);
+
+  // Environmental Honesty Modal State
+  const [isEnvHonestyOpen, setIsEnvHonestyOpen] = useState(false);
 
   // SEP Alert State
   const [sepAlertActive, setSepAlertActive] = useState(false);
@@ -34,26 +39,42 @@ export default function App() {
     }));
   };
 
-  const handleTriggerSepAlert = () => {
-    setSepAlertActive(true);
-    setShowEnvOverlay(true);
+  const handleAddCustomWaypoint = (latlng) => {
+    if (!isPlacingWaypoint) return;
+    setCustomWaypoints(prev => [...prev, latlng]);
   };
 
-  const handleResetSepAlert = () => {
-    setSepAlertActive(false);
+  const handleClearCustomWaypoints = () => {
+    setCustomWaypoints([]);
+    setIsPlacingWaypoint(false);
   };
 
-  const activeTarget = RESEARCH_TARGETS.find(t => t.id === activeTargetId) || null;
+  const handleSelectSortie = (sortieId) => {
+    setActiveSortieId(sortieId);
+    setCustomWaypoints([]); // Switch back to preset sortie
+    setIsPlacingWaypoint(false);
+
+    // If sortie 1 selected, focus on T7
+    if (sortieId === 'sortie-1') {
+      setActiveTargetId('T7');
+    } else if (sortieId === 'sortie-2') {
+      setActiveTargetId('T2');
+    }
+  };
+
+  const activeSortie = PRESET_SORTIES.find(s => s.id === activeSortieId) || PRESET_SORTIES[0];
+  const activeTarget = VERIFIED_TARGETS.find(t => t.id === activeTargetId) || null;
 
   return (
     <div className="w-screen h-screen flex flex-col bg-[#F8F9FA] text-[#0F172A] font-sans overflow-hidden">
       {/* Top Editorial Command & Telemetry Bar */}
       <HeaderBar
         sepAlertActive={sepAlertActive}
-        onTriggerSepAlert={handleTriggerSepAlert}
-        onResetSepAlert={handleResetSepAlert}
+        onTriggerSepAlert={() => setSepAlertActive(true)}
+        onResetSepAlert={() => setSepAlertActive(false)}
         activeTargetId={activeTargetId}
         onSelectTarget={setActiveTargetId}
+        onOpenEnvHonestyModal={() => setIsEnvHonestyOpen(true)}
       />
 
       {/* Emergency SEP Proton Storm Alarm Dropdown */}
@@ -65,41 +86,52 @@ export default function App() {
 
       {/* Main Full-Viewport Spatial Workspace */}
       <main className="flex-1 w-full h-[calc(100vh-68px)] relative flex overflow-hidden">
-        {/* Left Floating Drawer: Satellite Tile Layers & Research Corridor */}
-        <LayerDrawer
+        {/* Left Floating Drawer: Traverse Planner & HiRISE Layer Opacities */}
+        <TraversePlannerDrawer
           layerOpacities={layerOpacities}
           onOpacityChange={handleOpacityChange}
-          showCorridor={showCorridor}
-          onToggleCorridor={() => setShowCorridor(prev => !prev)}
-          showEnvOverlay={showEnvOverlay}
-          onToggleEnvOverlay={() => setShowEnvOverlay(prev => !prev)}
-          sepAlertActive={sepAlertActive}
-          onTriggerSepAlert={handleTriggerSepAlert}
-          onResetSepAlert={handleResetSepAlert}
+          activeSortieId={activeSortieId}
+          onSelectSortie={handleSelectSortie}
           activeTargetId={activeTargetId}
           onSelectTarget={setActiveTargetId}
+          customWaypoints={customWaypoints}
+          onClearCustomWaypoints={handleClearCustomWaypoints}
+          isPlacingWaypoint={isPlacingWaypoint}
+          onTogglePlaceWaypoint={() => setIsPlacingWaypoint(prev => !prev)}
+          onOpenEnvHonestyModal={() => setIsEnvHonestyOpen(true)}
         />
 
-        {/* Center: Real NASA Mars Trek Satellite Map Engine (Leaflet) */}
+        {/* Center: Max-Resolution NASA Mars Trek Satellite Map Engine (Leaflet) */}
         <div className="flex-1 h-full relative overflow-hidden">
           <MarsTrekMap
             layerOpacities={layerOpacities}
             activeTargetId={activeTargetId}
             onSelectTarget={setActiveTargetId}
+            activeSortie={activeSortie}
+            customWaypoints={customWaypoints}
+            onAddCustomWaypoint={handleAddCustomWaypoint}
+            isPlacingWaypoint={isPlacingWaypoint}
             sepAlertActive={sepAlertActive}
-            showCorridor={showCorridor}
-            showEnvOverlay={showEnvOverlay}
           />
         </div>
 
-        {/* Right Slide-over Drawer: Scientific Evidence & Astronaut EVA Intelligence */}
+        {/* Right Slide-over Drawer: 8-Part Evidence Chain Card */}
         {activeTarget && (
-          <TargetIntelligenceDrawer
+          <TargetEvidenceCard
             target={activeTarget}
             onClose={() => setActiveTargetId(null)}
           />
         )}
       </main>
+
+      {/* Environmental & Radiation Honesty Modal */}
+      <EnvHonestyModal
+        isOpen={isEnvHonestyOpen}
+        onClose={() => setIsEnvHonestyOpen(false)}
+        sepAlertActive={sepAlertActive}
+        onTriggerSepAlert={() => setSepAlertActive(true)}
+        onResetSepAlert={() => setSepAlertActive(false)}
+      />
     </div>
   );
 }

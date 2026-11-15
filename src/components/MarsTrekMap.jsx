@@ -1,46 +1,53 @@
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import { RESEARCH_TARGETS, MISSION_METADATA } from '../data/marsDossierData';
+import { 
+  VERIFIED_TARGETS, 
+  NASA_TILE_LAYERS, 
+  MARS_CONSTANTS,
+  calculateMarsDistanceMeters 
+} from '../data/marsDossierData';
 
 export default function MarsTrekMap({
   layerOpacities,
   activeTargetId,
   onSelectTarget,
-  sepAlertActive,
-  showCorridor,
-  showEnvOverlay
+  activeSortie,
+  customWaypoints,
+  onAddCustomWaypoint,
+  isPlacingWaypoint,
+  sepAlertActive
 }) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const tileLayersRef = useRef({});
   const markersRef = useRef({});
-  const corridorLayerRef = useRef(null);
-  const envLayerRef = useRef(null);
+  const customMarkersRef = useRef([]);
+  const traverseLineRef = useRef(null);
+  const shelterLayerRef = useRef(null);
 
-  // Initialize Map Once
+  // Initialize Leaflet Map
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
-    // Mars custom coordinates setup
-    // Center: Jezero Crater (18.444 N, 77.401 E)
-    const initialCenter = [MISSION_METADATA.targetCenter.lat, MISSION_METADATA.targetCenter.lng];
-    const initialZoom = MISSION_METADATA.targetCenter.zoom;
+    // Center on Neretva & Bright Angel micro-area (18.4968, 77.3045) at high zoom 16
+    const initialCenter = [18.4968, 77.3045];
+    const initialZoom = 16;
 
     const map = L.map(mapContainerRef.current, {
       center: initialCenter,
       zoom: initialZoom,
       minZoom: 5,
-      maxZoom: 17,
+      maxZoom: 20,
       zoomControl: false,
       attributionControl: true
     });
 
-    // Add scale bar
+    // Custom Scale bar in meters
     L.control.scale({
       metric: true,
       imperial: false,
       position: 'bottomleft',
-      maxWidth: 150
+      maxWidth: 180
     }).addTo(map);
 
     // Zoom control in top right
@@ -48,78 +55,70 @@ export default function MarsTrekMap({
       position: 'topright'
     }).addTo(map);
 
-    // 1. Base Optical Tile Layer (Viking Color Mosaic)
-    const opticalLayer = L.tileLayer(
-      'https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0//default/default028mm/{z}/{y}/{x}.jpg',
+    // 1. Max-Res HiRISE + CTX Mosaic (~0.25–1 m/px native)
+    const hiriseLayer = L.tileLayer(
+      'https://trek.nasa.gov/tiles/Mars/EQ/NES_JEZ_MID_Visible_Mosaic_HiRISE_CTX_HRSC_GCS_MARS_07-10-2018/1.0.0/default/default028mm/{z}/{y}/{x}.png',
+      {
+        attribution: 'NASA / JPL / MSSS / UofA / Mars Trek',
+        opacity: layerOpacities.hirise_maxres ?? 1.0,
+        maxNativeZoom: 19,
+        maxZoom: 20,
+        errorTileUrl: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" fill="transparent"></svg>'
+      }
+    ).addTo(map);
+
+    // 2. Viking MDIM 2.1 Color Mosaic (232 m/px)
+    const vikingLayer = L.tileLayer(
+      'https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg',
       {
         attribution: 'NASA / JPL / USGS',
-        opacity: layerOpacities.optical,
+        opacity: layerOpacities.viking_global ?? 0.35,
         maxNativeZoom: 8,
-        maxZoom: 18,
-        errorTileUrl: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" fill="%23e2e8f0"></svg>'
+        maxZoom: 20,
+        errorTileUrl: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" fill="%23E2E8F0"></svg>'
       }
     ).addTo(map);
 
-    // 2. High-Res Jezero Crater CTX Mosaic
-    const jezeroLayer = L.tileLayer(
-      'https://trek.nasa.gov/tiles/Mars/EQ/Jezerocrater_CTX_Mosaic_6m/1.0.0//default/default028mm/{z}/{y}/{x}.png',
-      {
-        attribution: 'NASA / JPL / MSSS / Mars Trek',
-        opacity: layerOpacities.jezero_ctx,
-        maxNativeZoom: 15,
-        maxZoom: 18,
-        errorTileUrl: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" fill="transparent"></svg>'
-      }
-    ).addTo(map);
-
-    // 3. THEMIS Day IR (Thermal Inertia)
-    const themisLayer = L.tileLayer(
-      'https://trek.nasa.gov/tiles/Mars/EQ/Mars_THEMIS_IR_Day_Mosaic_global_100m/1.0.0//default/default028mm/{z}/{y}/{x}.jpg',
-      {
-        attribution: 'NASA / JPL / ASU',
-        opacity: layerOpacities.themis_ir,
-        maxNativeZoom: 9,
-        maxZoom: 18,
-        errorTileUrl: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" fill="transparent"></svg>'
-      }
-    ).addTo(map);
-
-    // 4. MOLA Topographic DEM (Colorized Hillshade)
+    // 3. MOLA Topographic DEM & Colorized Hillshade (463 m/px)
     const molaLayer = L.tileLayer(
-      'https://trek.nasa.gov/tiles/Mars/EQ/Mars_MOLA_blend200ppx_HRSC_Shade_clon0dd_200mpp_lzw/1.0.0//default/default028mm/{z}/{y}/{x}.jpg',
+      'https://trek.nasa.gov/tiles/Mars/EQ/Mars_MGS_MOLA_ClrShade_merge_global_463m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg',
       {
         attribution: 'NASA / GSFC / MOLA Team',
-        opacity: layerOpacities.mola_dem,
+        opacity: layerOpacities.mola_topo ?? 0.30,
         maxNativeZoom: 8,
-        maxZoom: 18,
+        maxZoom: 20,
+        errorTileUrl: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" fill="transparent"></svg>'
+      }
+    ).addTo(map);
+
+    // 4. THEMIS-IR Day Global Mosaic (100 m/px)
+    const themisLayer = L.tileLayer(
+      'https://trek.nasa.gov/tiles/Mars/EQ/Mars_MO_THEMIS-IR-Day_mosaic_global_100m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg',
+      {
+        attribution: 'NASA / JPL / ASU',
+        opacity: layerOpacities.themis_day_ir ?? 0.25,
+        maxNativeZoom: 9,
+        maxZoom: 20,
         errorTileUrl: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" fill="transparent"></svg>'
       }
     ).addTo(map);
 
     tileLayersRef.current = {
-      optical: opticalLayer,
-      jezero_ctx: jezeroLayer,
-      themis_ir: themisLayer,
-      mola_dem: molaLayer
+      hirise_maxres: hiriseLayer,
+      viking_global: vikingLayer,
+      mola_topo: molaLayer,
+      themis_day_ir: themisLayer
     };
 
-    // Add Alpha Habitat Station Marker
-    const habIcon = L.divIcon({
-      className: 'custom-hab-marker',
-      html: `
-        <div style="display:flex; align-items:center; background:#0F172A; color:#FFFFFF; padding:3px 8px; border-radius:6px; border:1px solid #334155; font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; box-shadow:0 4px 10px rgba(0,0,0,0.15); white-space:nowrap;">
-          <span style="display:inline-block; width:6px; height:6px; background:#10B981; border-radius:50%; margin-right:5px;"></span>
-          HABITAT ALPHA
-        </div>
-      `,
-      iconSize: [120, 24],
-      iconAnchor: [60, 12]
+    // Click handler for dropping custom meter-scale waypoints
+    map.on('click', (e) => {
+      if (onAddCustomWaypoint) {
+        onAddCustomWaypoint({
+          lat: Number(e.latlng.lat.toFixed(5)),
+          lng: Number(e.latlng.lng.toFixed(5))
+        });
+      }
     });
-
-    L.marker([MISSION_METADATA.habitatCoords.lat, MISSION_METADATA.habitatCoords.lng], {
-      icon: habIcon,
-      zIndexOffset: 100
-    }).addTo(map);
 
     mapInstanceRef.current = map;
 
@@ -129,18 +128,18 @@ export default function MarsTrekMap({
     };
   }, []);
 
-  // Sync layer opacities dynamically
+  // Update Tile Layer Opacities
   useEffect(() => {
     if (!tileLayersRef.current) return;
     Object.keys(layerOpacities).forEach((layerKey) => {
-      const tileLayer = tileLayersRef.current[layerKey];
-      if (tileLayer) {
-        tileLayer.setOpacity(layerOpacities[layerKey]);
+      const layer = tileLayersRef.current[layerKey];
+      if (layer) {
+        layer.setOpacity(layerOpacities[layerKey]);
       }
     });
   }, [layerOpacities]);
 
-  // Update Markers & Research Corridor
+  // Update 9 Verified Target Markers (T1-T9)
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
@@ -149,41 +148,41 @@ export default function MarsTrekMap({
     Object.values(markersRef.current).forEach(marker => map.removeLayer(marker));
     markersRef.current = {};
 
-    // Render 5 Research Targets
-    RESEARCH_TARGETS.forEach((target) => {
+    VERIFIED_TARGETS.forEach((target) => {
       const isSelected = activeTargetId === target.id;
-      const isCheyava = target.isPrimaryTarget;
+      const isBrightAngel = target.id === 'T7';
+      const isExtended = target.isExtended;
 
       const markerHtml = `
-        <div class="relative group cursor-pointer" style="display:flex; flex-direction:column; align-items:center;">
-          ${isCheyava ? `
-            <div style="position:absolute; top:-6px; width:44px; height:44px; border:2px dashed #C2410C; border-radius:50%; animation:spin 12s linear infinite; pointer-events:none;"></div>
+        <div style="display:flex; flex-direction:column; align-items:center; cursor:pointer;" class="group">
+          ${isBrightAngel ? `
+            <div style="position:absolute; top:-6px; width:46px; height:46px; border:2px dashed #C2410C; border-radius:50%; animation:spin 12s linear infinite; pointer-events:none;"></div>
           ` : ''}
           <div style="
             display:flex; align-items:center; gap:6px;
             background:${isSelected ? '#0F172A' : '#FFFFFF'};
             color:${isSelected ? '#FFFFFF' : '#0F172A'};
-            padding:4px 8px;
+            padding:3.5px 8px;
             border-radius:20px;
-            border:1.5px solid ${isSelected ? '#C2410C' : isCheyava ? '#C2410C' : '#CBD5E1'};
-            box-shadow:0 4px 12px rgba(15,23,42,0.12);
+            border:1.5px solid ${isSelected ? '#C2410C' : isBrightAngel ? '#C2410C' : isExtended ? '#94A3B8' : '#CBD5E1'};
+            box-shadow:0 3px 10px rgba(15,23,42,0.12);
             font-family:'Space Grotesk',sans-serif;
             font-size:11px;
             font-weight:700;
             white-space:nowrap;
-            transition:all 0.2s;
+            transition:all 0.15s;
           ">
             <span style="
-              display:flex; align-items:center; justify-content:center;
-              width:16px; height:16px; border-radius:50%;
-              background:${isSelected ? '#C2410C' : isCheyava ? '#C2410C' : '#E2E8F0'};
-              color:${isSelected || isCheyava ? '#FFFFFF' : '#475569'};
-              font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:700;
+              display:inline-flex; align-items:center; justify-content:center;
+              width:18px; height:18px; border-radius:50%;
+              background:${isSelected ? '#C2410C' : isBrightAngel ? '#C2410C' : isExtended ? '#E2E8F0' : '#0F172A'};
+              color:${isSelected || isBrightAngel ? '#FFFFFF' : isExtended ? '#475569' : '#FFFFFF'};
+              font-family:'JetBrains Mono',monospace; font-size:9.5px; font-weight:700;
             ">${target.num}</span>
             <span>${target.shortName}</span>
           </div>
           <div style="
-            background:${isSelected ? '#C2410C' : '#64748B'};
+            background:${isSelected ? '#C2410C' : '#475569'};
             color:#FFFFFF;
             font-family:'JetBrains Mono',monospace;
             font-size:9px;
@@ -191,20 +190,21 @@ export default function MarsTrekMap({
             padding:1px 5px;
             border-radius:3px;
             margin-top:2px;
+            box-shadow:0 1px 3px rgba(0,0,0,0.2);
           ">${target.elevation}m</div>
         </div>
       `;
 
-      const customIcon = L.divIcon({
+      const icon = L.divIcon({
         className: `target-marker-${target.id}`,
         html: markerHtml,
-        iconSize: [160, 48],
-        iconAnchor: [80, 24]
+        iconSize: [170, 50],
+        iconAnchor: [85, 25]
       });
 
       const marker = L.marker([target.lat, target.lng], {
-        icon: customIcon,
-        zIndexOffset: isSelected ? 500 : isCheyava ? 400 : 200
+        icon,
+        zIndexOffset: isSelected ? 600 : isBrightAngel ? 500 : 200
       }).addTo(map);
 
       marker.on('click', () => {
@@ -213,114 +213,157 @@ export default function MarsTrekMap({
 
       markersRef.current[target.id] = marker;
     });
+  }, [activeTargetId, onSelectTarget]);
 
-    // Render Research Corridor Polyline
-    if (corridorLayerRef.current) {
-      map.removeLayer(corridorLayerRef.current);
-      corridorLayerRef.current = null;
-    }
-
-    if (showCorridor) {
-      const corridorCoords = [
-        [MISSION_METADATA.habitatCoords.lat, MISSION_METADATA.habitatCoords.lng],
-        [RESEARCH_TARGETS[0].lat, RESEARCH_TARGETS[0].lng],
-        [RESEARCH_TARGETS[1].lat, RESEARCH_TARGETS[1].lng],
-        [RESEARCH_TARGETS[2].lat, RESEARCH_TARGETS[2].lng],
-        [RESEARCH_TARGETS[3].lat, RESEARCH_TARGETS[3].lng],
-        [RESEARCH_TARGETS[4].lat, RESEARCH_TARGETS[4].lng],
-      ];
-
-      const polyline = L.polyline(corridorCoords, {
-        color: '#C2410C',
-        weight: 3.5,
-        opacity: 0.85,
-        dashArray: '6, 6',
-        lineCap: 'round',
-        lineJoin: 'round'
-      }).addTo(map);
-
-      corridorLayerRef.current = polyline;
-    }
-  }, [activeTargetId, showCorridor, onSelectTarget]);
-
-  // Center on active target when selected
-  useEffect(() => {
-    const map = mapInstanceRef.current;
-    if (!map || !activeTargetId) return;
-
-    const target = RESEARCH_TARGETS.find(t => t.id === activeTargetId);
-    if (target) {
-      map.flyTo([target.lat, target.lng], 14, {
-        duration: 1.2
-      });
-    }
-  }, [activeTargetId]);
-
-  // Environmental / Space Weather Layer & SEP Alert Highlights
+  // Update Custom Placed Waypoints
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    if (envLayerRef.current) {
-      map.removeLayer(envLayerRef.current);
-      envLayerRef.current = null;
+    // Clear old custom markers
+    customMarkersRef.current.forEach(m => map.removeLayer(m));
+    customMarkersRef.current = [];
+
+    customWaypoints.forEach((wp, index) => {
+      const customIcon = L.divIcon({
+        className: 'custom-wp-pin',
+        html: `
+          <div style="display:flex; align-items:center; justify-content:center; width:22px; height:22px; background:#1D4ED8; color:#FFFFFF; border:2px solid #FFFFFF; border-radius:50%; font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; box-shadow:0 2px 6px rgba(0,0,0,0.3);">
+            ${index + 1}
+          </div>
+        `,
+        iconSize: [22, 22],
+        iconAnchor: [11, 11]
+      });
+
+      const m = L.marker([wp.lat, wp.lng], { icon: customIcon, zIndexOffset: 450 }).addTo(map);
+      customMarkersRef.current.push(m);
+    });
+  }, [customWaypoints]);
+
+  // Render Active Sortie Traverse Polyline & Elevation Line
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (traverseLineRef.current) {
+      map.removeLayer(traverseLineRef.current);
+      traverseLineRef.current = null;
     }
 
-    if (showEnvOverlay || sepAlertActive) {
+    // Determine coordinates based on activeSortie or customWaypoints
+    let routeCoords = [];
+    let isReference = false;
+
+    if (customWaypoints && customWaypoints.length > 0) {
+      // Connect custom waypoints
+      routeCoords = customWaypoints.map(wp => [wp.lat, wp.lng]);
+    } else if (activeSortie) {
+      isReference = Boolean(activeSortie.isReferenceOnly);
+      routeCoords = activeSortie.targetIds.map(tId => {
+        const t = VERIFIED_TARGETS.find(target => target.id === tId);
+        return t ? [t.lat, t.lng] : null;
+      }).filter(Boolean);
+    }
+
+    if (routeCoords.length >= 2) {
+      const polyline = L.polyline(routeCoords, {
+        color: isReference ? '#64748B' : '#C2410C',
+        weight: isReference ? 2.5 : 4,
+        dashArray: isReference ? '6, 6' : '8, 4',
+        opacity: 0.9,
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).addTo(map);
+
+      traverseLineRef.current = polyline;
+    }
+  }, [activeSortie, customWaypoints]);
+
+  // Handle Sortie Zoom / Center changes
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !activeSortie) return;
+
+    map.flyTo(activeSortie.center, activeSortie.zoom, {
+      duration: 1.2
+    });
+  }, [activeSortie]);
+
+  // Handle Target Selection FlyTo
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !activeTargetId) return;
+
+    const target = VERIFIED_TARGETS.find(t => t.id === activeTargetId);
+    if (target) {
+      map.flyTo([target.lat, target.lng], Math.max(map.getZoom(), 16), {
+        duration: 1.0
+      });
+    }
+  }, [activeTargetId]);
+
+  // SEP Alert Safe Shelters (T6 Neretva Overhang & T7 Bright Angel)
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (shelterLayerRef.current) {
+      map.removeLayer(shelterLayerRef.current);
+      shelterLayerRef.current = null;
+    }
+
+    if (sepAlertActive) {
       const group = L.layerGroup();
 
-      if (sepAlertActive) {
-        // Highlight terrain-shielded sites: Target 02 (68%) and Target 04 (62%)
-        const shelterSites = [RESEARCH_TARGETS[1], RESEARCH_TARGETS[3]];
-        shelterSites.forEach((site) => {
-          const circle = L.circle([site.lat, site.lng], {
-            radius: 450,
-            color: '#047857',
-            fillColor: '#10B981',
-            fillOpacity: 0.25,
-            weight: 2,
-            dashArray: '4, 4'
-          });
-
-          const label = L.marker([site.lat, site.lng], {
-            icon: L.divIcon({
-              className: 'shelter-label',
-              html: `<div style="background:#047857; color:#FFFFFF; padding:2px 6px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:700;">★ TERRAIN SHELTER (${site.terrainShieldingPct}% SHIELD)</div>`,
-              iconAnchor: [60, -20]
-            })
-          });
-
-          group.addLayer(circle);
-          group.addLayer(label);
+      // Highlight T6 and T7 as nearest terrain shielding
+      const shelterTargets = [VERIFIED_TARGETS[5], VERIFIED_TARGETS[6]];
+      shelterTargets.forEach(t => {
+        const circle = L.circle([t.lat, t.lng], {
+          radius: 120,
+          color: '#047857',
+          fillColor: '#10B981',
+          fillOpacity: 0.35,
+          weight: 2,
+          dashArray: '4, 4'
         });
 
-        // Unshielded hazardous plains warning ring
-        const hazardRing = L.circle([MISSION_METADATA.targetCenter.lat, MISSION_METADATA.targetCenter.lng], {
-          radius: 4000,
-          color: '#DC2626',
-          fillColor: '#EF4444',
-          fillOpacity: 0.08,
-          weight: 2
+        const label = L.marker([t.lat, t.lng], {
+          icon: L.divIcon({
+            className: 'shelter-pin',
+            html: `<div style="background:#047857; color:#FFFFFF; padding:2px 6px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:700; white-space:nowrap; box-shadow:0 2px 5px rgba(0,0,0,0.2);">★ PRIMARY SHELTER ALCOVE</div>`,
+            iconAnchor: [60, -22]
+          })
         });
-        group.addLayer(hazardRing);
-      }
+
+        group.addLayer(circle);
+        group.addLayer(label);
+      });
 
       group.addTo(map);
-      envLayerRef.current = group;
+      shelterLayerRef.current = group;
     }
-  }, [showEnvOverlay, sepAlertActive]);
+  }, [sepAlertActive]);
 
   return (
     <div className="relative w-full h-full bg-[#E2E8F0] overflow-hidden select-none">
-      <div ref={mapContainerRef} className="w-full h-full z-0" />
+      <div 
+        ref={mapContainerRef} 
+        className={`w-full h-full z-0 ${isPlacingWaypoint ? 'cursor-crosshair' : ''}`} 
+      />
 
-      {/* Coordinate & Crosshair Telemetry Stamp (Bottom Center) */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none bg-white/90 border border-slate-300 px-3 py-1 rounded-md shadow-subtle backdrop-blur-sm text-slate-700 font-mono text-[11px] flex items-center space-x-3">
-        <span>JEZERO CRATER: <strong className="text-slate-900">18.444° N, 77.401° E</strong></span>
-        <span className="text-slate-300">|</span>
-        <span>DATUM: <strong className="text-terracotta-700">MARS 2000 SPHERE</strong></span>
-        <span className="text-slate-300">|</span>
-        <span className="text-emerald-700 font-semibold">NASA JPL MARS TREK LIVE WMTS</span>
+      {/* Crosshair Overlay Notice if Placing Custom Waypoints */}
+      {isPlacingWaypoint && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none bg-blue-700 text-white px-3.5 py-1.5 rounded-full shadow-lg font-mono text-xs flex items-center space-x-2 animate-bounce-short">
+          <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
+          <span>CLICK ANYWHERE ON HiRISE SATELLITE TILES TO DROP EVA WAYPOINT</span>
+        </div>
+      )}
+
+      {/* Coordinate Reference System (CRS) Guardrail Badge in Map Footer */}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 pointer-events-none bg-white/95 border border-slate-300 px-3 py-1 rounded shadow-subtle backdrop-blur-md text-slate-700 font-mono text-[10px] flex items-center space-x-2 text-center max-w-[95vw] truncate">
+        <span className="w-1.5 h-1.5 rounded-full bg-terracotta-600 shrink-0"></span>
+        <span className="truncate">{MARS_CONSTANTS.CRS_GUARDRAIL_NOTE}</span>
       </div>
     </div>
   );

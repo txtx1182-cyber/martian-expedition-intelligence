@@ -1,101 +1,113 @@
-# MISSION 001: MARTIAN EXPEDITION INTELLIGENCE
-### Editorial-Grade Planetary Science & Astronaut EVA Planning Platform
+# MISSION 001 / JEZERO EXPEDITION INTELLIGENCE
+### Max-Resolution Planetary Surface & Astronaut Traverse Planning Platform
 **NASA Space Apps Challenge 2026 — Challenge 11: Interplanetary Survival Guide: Martian Map**
 
 ![NASA Space Apps 2026](https://img.shields.io/badge/NASA%20Space%20Apps-2026-C2410C?style=for-the-badge&logo=nasa)
 ![React 18](https://img.shields.io/badge/React-18.3.1-1D4ED8?style=for-the-badge&logo=react)
 ![Leaflet](https://img.shields.io/badge/Leaflet-1.9.4-047857?style=for-the-badge&logo=leaflet)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-0F172A?style=for-the-badge&logo=tailwindcss)
+![HiRISE](https://img.shields.io/badge/HiRISE-0.25m%2Fpx-0F172A?style=for-the-badge)
 ![Build Status](https://img.shields.io/badge/Build-Passing-10B981?style=for-the-badge)
 
 ---
 
-## 1. Overview & Editorial Design Philosophy
+## 1. Overview & Visual Aesthetic
 
-**MISSION 001: MARTIAN EXPEDITION INTELLIGENCE** is an editorial-grade, light-mode planetary science and astronaut surface exploration platform developed for **NASA Space Apps Challenge 2026 (Challenge 11)**.
+**MISSION 001 / JEZERO EXPEDITION INTELLIGENCE** is an editorial-grade, light-mode planetary science and astronaut EVA traverse planning platform built for **NASA Space Apps Challenge 2026 (Challenge 11)**.
 
-Rejecting generic "sci-fi neon AI slop", the application adheres to high-craft Swiss cartographic principles, USGS Geological Survey standards, and NASA JPL Eyes design systems:
-- **Canvas:** Warm alabaster (`#F8F9FA`) with pure white inspector panels (`#FFFFFF`) and 1px crisp borders (`#CBD5E1`).
-- **Typography:** Google Fonts **`Space Grotesk`** (editorial headings), **`Plus Jakarta Sans`** (clean scientific body text), and **`JetBrains Mono`** (strictly for coordinates, elevation heights, DOIs, and rover telemetry).
-- **Cartographic Engine:** Real **Leaflet.js** engine streaming live **NASA JPL Mars Trek WMTS XYZ tiles** centered on **Jezero Crater, Mars (`18.444° N, 77.401° E`, zoom `13`)**.
+Adhering strictly to Swiss cartographic design, USGS Planetary Geologic Maps, and NASA JPL Eyes design systems, the interface rejects dark neon aesthetics in favor of a clean, high-craft scientific workspace:
+- **Canvas:** Warm alabaster (`#F8F9FA`), pure white inspector surfaces (`#FFFFFF`), 1px crisp borders (`#CBD5E1`), and deep slate ink (`#0F172A`).
+- **Accents:** Mars Terracotta (`#C2410C`), Scientific Cobalt (`#1D4ED8`), and Safe Emerald (`#047857`).
+- **Typography:** Google Fonts **`Space Grotesk`** (headings), **`Plus Jakarta Sans`** (scientific body text), and **`JetBrains Mono`** (strictly for coordinates, elevations, PDS product IDs, and DOIs).
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                      MISSION 001: MARTIAN EXPEDITION INTELLIGENCE                       │
+│                      MISSION 001 / JEZERO EXPEDITION INTELLIGENCE                      │
 ├─────────────────────────┬──────────────────────────────────┬───────────────────────────┤
-│ LAYER & CORRIDOR DRAWER │ REAL NASA MARS TREK LEAFLET MAP  │ TARGET INTELLIGENCE       │
-│ (320px)                 │ (Center Full Viewport)           │ (420px Slide-Over)        │
-│ • 4 Live NASA WMTS      │ • Viking Color Mosaic (232m)     │ • 4 Separated Scores      │
-│   Tile Opacity Sliders  │ • Jezero CTX / HiRISE (6m)       │ • Epistemological Badges  │
-│ • Research Corridor     │ • THEMIS Day IR Thermal Inertia  │ • DOI Citations           │
-│ • RAD / MEDA Telemetry  │ • MOLA Topographic DEM Shading   │ • Astrobiology Rigor      │
-│ • Simulate SEP Storm    │ • 5 Dossier Target Pins + Path   │ • Astronaut EVA Consumable│
+│ TRAVERSE PLANNER DRAWER │ MAX-RES MARS TREK LEAFLET MAP    │ TARGET EVIDENCE CARD      │
+│ (320px Floating Left)   │ (Center Full Viewport Canvas)    │ (420px Slide-Over Right)  │
+│ • Preset Sorties 1 & 2  │ • HiRISE 0.25m/px Mosaic (Zoom19)│ • 8-Part Evidence Chain   │
+│ • Custom EVA Builder    │ • Viking Global Color Mosaic     │ • Qualitative Assessments │
+│ • HiRISE / MOLA / THEMIS│ • MOLA Topographic Hillshade     │ • Exact PDS Product IDs   │
+│   Layer Opacity Sliders │ • THEMIS-IR Day Global Mosaic    │ • Astrobiology Rigor      │
+│ • Elevation Profile SVG │ • 9 Verified Targets (T1–T9)     │ • Published DOIs          │
+│ • RAD / MEDA Audit      │ • CRS Guardrail Footer Badge     │ • Falsification Criteria  │
 └─────────────────────────┴──────────────────────────────────┴───────────────────────────┘
 ```
 
 ---
 
-## 2. Real NASA Mars Trek Satellite Tile Engine
+## 2. Max-Resolution NASA Mars Trek Satellite Engine (Zoom 14–19)
 
-The map streams real live WMTS XYZ satellite imagery directly from **NASA JPL Mars Trek** with dynamic opacity blending:
+The map engine renders live WMTS XYZ satellite tiles directly from **NASA JPL Mars Trek** supporting zoom levels 12 to 20 with `maxNativeZoom: 19`, allowing users to zoom down to **meter-scale rocks and individual outcrop fractures**:
 
-1. **Optical Layer (Viking Color Mosaic):**
-   `https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0//default/default028mm/{z}/{y}/{x}.jpg`
-2. **High-Res Jezero Crater CTX Overlay (6m):**
-   `https://trek.nasa.gov/tiles/Mars/EQ/Jezerocrater_CTX_Mosaic_6m/1.0.0//default/default028mm/{z}/{y}/{x}.png`
-3. **Thermal Infrared Layer (THEMIS Day IR):**
-   `https://trek.nasa.gov/tiles/Mars/EQ/Mars_THEMIS_IR_Day_Mosaic_global_100m/1.0.0//default/default028mm/{z}/{y}/{x}.jpg`
-4. **Topographic Elevation Layer (MOLA Colorized Hillshade):**
-   `https://trek.nasa.gov/tiles/Mars/EQ/Mars_MOLA_blend200ppx_HRSC_Shade_clon0dd_200mpp_lzw/1.0.0//default/default028mm/{z}/{y}/{x}.jpg`
-5. **Radiation & Environmental Layer (RAD / MEDA):**
-   GCR background (`0.64 mSv/day`), pressure (`725 Pa`), wind vector (`12 m/s NW`), dust opacity (`τ = 0.44`), and an interactive **"Simulate SEP Alert"** trigger highlighting terrain-shielded sites.
+1. **MAX-RES Optical Layer (MRO HiRISE + CTX + HRSC Jezero Mosaic, ~0.25–1 m/px native):**
+   `https://trek.nasa.gov/tiles/Mars/EQ/NES_JEZ_MID_Visible_Mosaic_HiRISE_CTX_HRSC_GCS_MARS_07-10-2018/1.0.0/default/default028mm/{z}/{y}/{x}.png`
+2. **Global Optical Fallback (Viking MDIM 2.1 Color Mosaic, 232 m/px):**
+   `https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg`
+3. **Topographic Elevation Layer (MGS MOLA + HRSC Colorized Hillshade, 463 m/px):**
+   `https://trek.nasa.gov/tiles/Mars/EQ/Mars_MGS_MOLA_ClrShade_merge_global_463m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg`
+4. **Thermal Infrared Layer (MO THEMIS-IR Day Global Mosaic, 100 m/px):**
+   `https://trek.nasa.gov/tiles/Mars/EQ/Mars_MO_THEMIS-IR-Day_mosaic_global_100m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg`
 
----
+### Resolution & Coverage Audit Guardrails
+Each layer features an individual opacity slider (0%–100%) and a dedicated **Native Resolution & Coverage Audit Badge**, explicitly warning users not to infer boulder-scale mobility safety from coarse CTX (~6 m/px), THEMIS (~100 m/px), or MOLA (~463 m/px) layers.
 
-## 3. Master Scientific Research Dossier (5 Verified Targets)
-
-| Target | Coordinates & Elevation | Geological Formation | Primary Literature Reference | 4 Separated Scores |
-|---|---|---|---|---|
-| **Target 01: Crater-Floor Igneous Formations** | `18.428° N, 77.451° E` (-2565 m) | Séítah & Máaz Igneous Basement | Farley et al. (2022), *Science* [DOI: 10.1126/science.abo2196](https://doi.org/10.1126/science.abo2196) | Hab: 48 \| Bio: 18 \| Sci: 82 \| Suit: 92 (Safe &lt;5°) |
-| **Target 02: Western Delta & Delta-Front Deposits** | `18.452° N, 77.422° E` (-2528 m) | Kodiak-Equivalent Delta Megaclasts | Mangold et al. (2021), *Science* [DOI: 10.1126/science.abl4051](https://doi.org/10.1126/science.abl4051) | Hab: 76 \| Bio: 35 \| Sci: 88 \| Suit: 64 (Caution 13°) |
-| **Target 03: Delta Fine-Grained Sedimentary Layers** | `18.458° N, 77.409° E` (-2510 m) | Lacustrine Mudstones (Smectite Clays) | Mangold et al. (2021) & Farley et al. (2020) [DOI: 10.1007/s11214-020-00762-y](https://doi.org/10.1007/s11214-020-00762-y) | Hab: 86 \| Bio: 58 \| Sci: 90 \| Suit: 76 (Safe 7°) |
-| **Target 04: Neretva Vallis & Bright Angel (Cheyava Falls)** | `18.444° N, 77.401° E` (-2521 m) | Veined Mudstones, Vivianite Fe-PO₄ & Greigite Fe-S | Hurowitz et al. (2025), *Nature* Vol. 645 [DOI: 10.1038/s41586-025-09413-0](https://doi.org/10.1038/s41586-025-09413-0) | Hab: 92 \| Bio: 86 \| Sci: 98 \| Suit: 84 (Caution 11°) |
-| **Target 05: Carbonate-Bearing Margin Unit** | `18.465° N, 77.388° E` (-2485 m) | Hydrated Shoreline Carbonates & Chert | Farley et al. (2020), *Space Sci. Rev.* [DOI: 10.1007/s11214-020-00762-y](https://doi.org/10.1007/s11214-020-00762-y) | Hab: 85 \| Bio: 54 \| Sci: 94 \| Suit: 51 (Warning 18°) |
+### Coordinate Reference System (CRS) Guardrail
+Displayed in the persistent map footer:
+> **"CRS: Mars 2000 Planetocentric (18.4446°N vs 18.3462°N Planetodetic = 5.8 km offset; USGS SIM 3464 carries 100–200 m offset)"**
 
 ---
 
-## 4. Epistemological Traceability & Astrobiological Rigor
+## 3. The 9 Verified Targets (T1–T9)
 
-In strict compliance with NASA scientific integrity directives:
+All targets are populated using exact planetocentric coordinates, elevations, and peer-reviewed literature from the research brief:
 
-### Target 04 Official Classification
-> **"POTENTIAL BIOSIGNATURE — NOT CONFIRMED EVIDENCE OF LIFE"**
-
-Each target in the **Target Intelligence Drawer** decomposes evidence into 4 distinct epistemological categories:
-1. `DIRECT OBSERVATION`: Empirical data from rover instruments (SHERLOC deep-UV Raman, PIXL micro-XRF, SuperCam RMI, Mastcam-Z).
-2. `PUBLISHED INTERPRETATION`: Peer-reviewed deductions with clickable direct DOI hyperlinks.
-3. `RESEARCH HYPOTHESIS`: Working models of ancient Jezero paleo-environments.
-4. `COMPETING ABIOTIC EXPLANATION`: Rigorous non-biological alternatives (e.g. low-temperature diagenetic fluid mixing, Fischer-Tropsch-type synthesis, or radiolytic organic alteration).
-
----
-
-## 5. Astronaut Marswalk (EVA) Operational Intelligence
-
-Switch between **Habitat Science Mode** and **Astronaut EVA Wrist-Pad Mode**:
-- Distance from **Habitat Alpha Station** (`18.435° N, 77.435° E`).
-- Dynamic walk-back safety timer based on average suit speed.
-- Consumable reserves burn projection (Spacesuit O₂ and battery capacity).
-- Slope angle stability warnings with bipedal mobility thresholds:
-  - 🟢 **Safe (`< 10°`):** Normal bipedal locomotion.
-  - 🟡 **Caution (`10°–15°`):** Center-of-mass strain; tether robotic MULE rover.
-  - 🔴 **Warning (`> 15°`):** Impassable crater rim scarp requiring switchbacks.
-- Perseverance **Mastcam-Z & Navcam eye-level ground context** so astronauts recognize rock formations upon arrival.
+| ID | Name | Coordinates | Elev. | Context & Primary Literature | Assessments (Hab / Bio / Sci / Acc / Conf) |
+|---|---|---|---|---|---|
+| **T1** | **Landing Site** | `18.4446°N, 77.4509°E` | -2569.9 m | Crater floor baseline; access to floor & delta (*Farley et al. 2020*) | Low–Mod / None / Mod / Easy / High |
+| **T2** | **Séítah** | `18.4325°N, 77.4407°E` | -2571.8 m | Olivine cumulate; Mg–Fe carbonates; void sulfates (*Farley et al. 2022*) | Mod / Weak–None / High / Easy / Mod |
+| **T3** | **Máaz** | `18.4619°N, 77.4361°E` | -2555.2 m | Overlying basaltic lava flows / sills (*Farley et al. 2022*) | Low–Mod / None / Mod / Easy / Mod |
+| **T4** | **Delta Front** | `18.4827°N, 77.3686°E` | -2421.1 m | Shenandoah Fm laminated mudstone / conglomerate (*Mangold et al. 2021*) | High / Potential / High / Mod / Mod |
+| **T5** | **Upper Delta** | `18.4954°N, 77.3466°E` | -2398.5 m | Topset beds, boulder conglomerate, flood scarp (*Mangold et al. 2021*) | High / Potential / High / Difficult / Mod |
+| **T6** | **Neretva** | `18.4961°N, 77.3038°E` | -2362.8 m | Valley-floor fluvial outcrops; approach to Bright Angel (~170 m from T7) | High / Potential / High / Mod / Mod |
+| **T7** | **Bright Angel** | `18.4974°N, 77.3051°E` | -2354.5 m | Organic-carbon mudstone; vivianite/greigite redox reaction fronts (*Hurowitz et al. 2025*) | High / Potential (Highest, not confirmed) / High / Mod / Mod–Low |
+| **T8** | **Margin Unit** *(Ext)* | `18.4606°N, 77.2647°E` | -1820.0 m | Inner rim carbonate unit; possible lacustrine carbonates (*Horgan et al. 2020*) | Mod–High / Potential / High / Difficult / Low–Mod |
+| **T9** | **West Rim** *(Ext)* | `18.4220°N, 77.2207°E` | -1973.6 m | Uplifted Noachian basement megabreccia block | Unknown / Unknown / High / Difficult / Low |
 
 ---
 
-## 6. Local Run & Deployment
+## 4. Interactive Meter-Scale EVA Route Planner
 
-### Quick Run
+- **Real Mars Spherical Calculation Engine:** Uses Mars's volumetric mean radius ($R = 3,389,500\text{ m}$) to compute exact segment distances in meters, elevation deltas ($\Delta z$), and grade percentages.
+- **Preset Local EVA Sorties:**
+  - **Sortie 1: Neretva → Bright Angel Micro-EVA (`~170 m` straight-line / `~240 m` traverse | `+8.3 m` elevation gain | `~3.5%` mean grade):** Zooms tightly into T6 and T7 at zoom 18 on the HiRISE mosaic.
+  - **Sortie 2: Crater Floor Igneous Transect (`T1 → T2`, `~930 m` | `-1.9 m` elevation change):** Flat baseline floor traverse.
+  - **Full Research Corridor Context (`T1 → T7`, `~37.2 km`):** Dashed reference transect with mandatory notice: *"SCIENTIFIC RESEARCH TRANSECT — NOT A CERTIFIED SINGLE HUMAN MARSWALK ROUTE"*.
+- **Custom Waypoint-to-Waypoint EVA Builder:** Allows users to tap directly on the meter-scale HiRISE satellite tiles to plot custom EVA traverses with real-time cumulative distance, walk time, and elevation profile chart.
+
+---
+
+## 5. 8-Part Scientific Evidence Chain & Environmental Honesty
+
+When clicking any target, the right drawer opens with an 8-part scientific inquiry card:
+1. **What is here?** (Geological description)
+2. **What was observed?** (PDS Product IDs: HiRISE `ESP_036618_1985`, `ESP_055211_1985`, `ESP_058930_1985`, `ESP_088272_1985`; HiRISE DTMs `DTEEC_045994_1985_046060_1985_U01`, `DTEEC_002387_1985_003798_1985_A01`; CRISM `ato00053d60_01_if125s_trr3`, `msv0005055b_01_if150s_trr3`, `msv0005079b_01_if150s_trr3`; CTX `P04_002743_1987_XI_18N282W`, `G13_023102_1986_XN_18N282W`)
+3. **What is interpreted?** (Published deductions with direct clickable DOIs)
+4. **How confident?** (Confidence rating + explicit reasoning)
+5. **What else could explain it?** (Mandatory abiotic counter-hypotheses)
+6. **What would change the assessment?** (Falsification & Mars Sample Return criteria)
+7. **Can we get there?** (Astronaut suit accessibility & terrain roughness)
+8. **Source & Data Availability Indicator** (Coverage confirmation)
+
+### Environmental Honesty Audit
+- **Radiation:** Explicitly states: *"No surface RAD sensor at Jezero; values shown are Gale Crater MSL RAD analogues / model estimates"* with interactive Solar Energetic Particle (SEP) storm alert simulation.
+- **Atmosphere (MEDA):** Jezero point measurements with uncertainty bands—never presented as a regional forecast.
+- **Water Ice Resource:** Explicitly labeled *"HYPOTHESIS ONLY — No verified present-day shallow ice deposit at Jezero Crater"*.
+
+---
+
+## 6. Local Development & Deployment
+
 ```bash
 # Clone and install dependencies
 git clone https://github.com/txtx1182-cyber/martian-expedition-intelligence.git
@@ -104,7 +116,9 @@ npm install
 
 # Run Vite dev server
 npm run dev
-# Accessible at http://localhost:3000
+
+# Build for production (compiles to dist/)
+npm run build
 ```
 
 ### Static Site Deployment on Render
