@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { 
   VERIFIED_TARGETS, 
@@ -33,6 +33,13 @@ export default function MarsTrekMap({
   const hazardLayerGroupRef = useRef(null);
   const hoverMarkerRef = useRef(null);
 
+  // High-Res Zoom-Triggered Image Overlays Refs
+  const tier1OverlayRef = useRef(null);
+  const tier2OverlayRef = useRef(null);
+
+  // Map Zoom State
+  const [currentZoom, setCurrentZoom] = useState(11);
+
   // Initialize Leaflet Map (Standard Web Mercator EPSG:3857)
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
@@ -42,10 +49,22 @@ export default function MarsTrekMap({
       center: [18.45, 77.40],
       zoom: 11,
       minZoom: 4,
-      maxZoom: 14,
+      maxZoom: 16,
       zoomControl: false,
       attributionControl: true
     });
+
+    // Custom Layer Panes for Strict Z-Index Isolation
+    if (!map.getPane('highResOverlayPane')) {
+      const overlayPane = map.createPane('highResOverlayPane');
+      overlayPane.style.zIndex = 450;
+      overlayPane.style.pointerEvents = 'none';
+    }
+
+    if (!map.getPane('routePane')) {
+      const routePane = map.createPane('routePane');
+      routePane.style.zIndex = 650;
+    }
 
     // Metric Scale Bar (km/m)
     L.control.scale({
@@ -60,6 +79,11 @@ export default function MarsTrekMap({
       position: 'topright'
     }).addTo(map);
 
+    // Track Zoom Changes
+    map.on('zoomend', () => {
+      setCurrentZoom(map.getZoom());
+    });
+
     // ==========================================================
     // 1. REAL VERIFIED WEB MERCATOR SATELLITE TILE LAYERS
     // ==========================================================
@@ -69,7 +93,7 @@ export default function MarsTrekMap({
       {
         attribution: '© OpenPlanetaryMap / NASA / JPL / USGS / CARTO',
         maxNativeZoom: 8,
-        maxZoom: 14,
+        maxZoom: 16,
         zIndex: 1,
         opacity: layerOpacities.mars_optical ?? 1.0
       }
@@ -82,7 +106,7 @@ export default function MarsTrekMap({
         attribution: 'NASA / GSFC / MOLA Team / WhereOnMars',
         tms: true,
         maxNativeZoom: 6,
-        maxZoom: 14,
+        maxZoom: 16,
         zIndex: 2,
         opacity: layerOpacities.mola_color ?? 0.65
       }
@@ -95,7 +119,7 @@ export default function MarsTrekMap({
         attribution: 'NASA / GSFC / MOLA Team / WhereOnMars',
         tms: true,
         maxNativeZoom: 6,
-        maxZoom: 14,
+        maxZoom: 16,
         zIndex: 3,
         opacity: layerOpacities.mola_gray ?? 0.50
       }
@@ -108,7 +132,7 @@ export default function MarsTrekMap({
         attribution: 'NASA / JPL / Celestia / WhereOnMars',
         tms: true,
         maxNativeZoom: 5,
-        maxZoom: 14,
+        maxZoom: 16,
         zIndex: 4,
         opacity: layerOpacities.celestia_shaded ?? 0.40
       }
@@ -122,7 +146,36 @@ export default function MarsTrekMap({
     };
 
     // ==========================================================
-    // 2. CRISM SPECTRAL MINERALOGY OVERLAYS
+    // 2. ZOOM-TRIGGERED GEOREFERENCED HIGH-RES NASA HiRISE OVERLAYS
+    // ==========================================================
+    // Tier 1 Overlay: Broader Western Delta Fan, Neretva Inlet, Kodiak, and Floor
+    // Bounding Box: [[18.425, 77.275], [18.525, 77.455]]
+    const tier1Overlay = L.imageOverlay(
+      '/maps/Layered Martian Delta and Cratered Plains.png',
+      [[18.425, 77.275], [18.525, 77.455]],
+      {
+        pane: 'highResOverlayPane',
+        opacity: 0,
+        className: 'transition-opacity duration-300'
+      }
+    ).addTo(map);
+    tier1OverlayRef.current = tier1Overlay;
+
+    // Tier 2 Overlay: Ultra-High-Res Upper Delta, Neretva Floor & Bright Angel Outcrop
+    // Bounding Box: [[18.458, 77.272], [18.515, 77.375]]
+    const tier2Overlay = L.imageOverlay(
+      '/maps/Martian Cratered Sediment Landscape.png',
+      [[18.458, 77.272], [18.515, 77.375]],
+      {
+        pane: 'highResOverlayPane',
+        opacity: 0,
+        className: 'transition-opacity duration-300'
+      }
+    ).addTo(map);
+    tier2OverlayRef.current = tier2Overlay;
+
+    // ==========================================================
+    // 3. CRISM SPECTRAL MINERALOGY OVERLAYS
     // ==========================================================
     const crismGroup = L.layerGroup().addTo(map);
     CRISM_MINERAL_POLYGONS.forEach(poly => {
@@ -146,7 +199,7 @@ export default function MarsTrekMap({
     crismLayerGroupRef.current = crismGroup;
 
     // ==========================================================
-    // 3. HAZARDS & RAD SHELTER OVERLAYS
+    // 4. HAZARDS & RAD SHELTER OVERLAYS
     // ==========================================================
     const hazardGroup = L.layerGroup().addTo(map);
     SLOPE_HAZARD_ZONES.forEach(zone => {
@@ -170,7 +223,8 @@ export default function MarsTrekMap({
     hazardLayerGroupRef.current = hazardGroup;
 
     // ==========================================================
-    // 4. RESEARCH TARGET MARKERS (T1–T7)
+    // 5. RESEARCH TARGET MARKERS (T1–T7)
+    // Strictly in markerPane above all image overlays
     // ==========================================================
     VERIFIED_TARGETS.forEach(target => {
       const isPrimary = target.isPrimaryTarget;
@@ -198,7 +252,10 @@ export default function MarsTrekMap({
         iconAnchor: [30, 21]
       });
 
-      const marker = L.marker([target.lat, target.lng], { icon: customIcon }).addTo(map);
+      const marker = L.marker([target.lat, target.lng], { 
+        icon: customIcon,
+        zIndexOffset: 650 
+      }).addTo(map);
 
       marker.bindTooltip(
         `<div class="p-1.5 font-sans">
@@ -258,7 +315,7 @@ export default function MarsTrekMap({
       if (layers.mola_gray) layers.mola_gray.setOpacity(layerOpacities.mola_gray ?? 0.80);
       if (layers.celestia_shaded) layers.celestia_shaded.setOpacity(0.0);
     } else if (activeMapMode === 'CELESTIA') {
-      if (layers.mars_optical) layers.mars_optical.setOpacity(0.20);
+      if (layers.mars_optical) layers.mars_optical.setOpacity(0.10);
       if (layers.mola_color) layers.mola_color.setOpacity(0.0);
       if (layers.mola_gray) layers.mola_gray.setOpacity(0.0);
       if (layers.celestia_shaded) layers.celestia_shaded.setOpacity(layerOpacities.celestia_shaded ?? 0.85);
@@ -270,6 +327,30 @@ export default function MarsTrekMap({
       if (layers.celestia_shaded) layers.celestia_shaded.setOpacity(layerOpacities.celestia_shaded ?? 0.40);
     }
   }, [activeMapMode, layerOpacities]);
+
+  // Manage Zoom-Triggered HiRISE Overlay Fades
+  // ONLY fades in when zoom >= 11 AND active basemap is Celestia 16k True Color!
+  useEffect(() => {
+    const isCelestiaActive = activeMapMode === 'CELESTIA';
+    const tier1 = tier1OverlayRef.current;
+    const tier2 = tier2OverlayRef.current;
+
+    if (!tier1 || !tier2) return;
+
+    if (!isCelestiaActive || currentZoom < 11) {
+      // Zoom < 11 or non-Celestia basemap: immediately hide both overlays
+      tier1.setOpacity(0);
+      tier2.setOpacity(0);
+    } else if (currentZoom >= 11 && currentZoom < 13) {
+      // Tier 1 High-Res Overlay: zoom 11 to 13
+      tier1.setOpacity(0.96);
+      tier2.setOpacity(0);
+    } else if (currentZoom >= 13) {
+      // Tier 2 Ultra-High-Res Outcrop Zoom: zoom >= 13
+      tier1.setOpacity(0.20);
+      tier2.setOpacity(0.98);
+    }
+  }, [activeMapMode, currentZoom]);
 
   // Update Route Polyline based on Selected Expedition or Custom Waypoints
   useEffect(() => {
@@ -300,9 +381,10 @@ export default function MarsTrekMap({
 
     if (latlngs.length >= 2) {
       const polyline = L.polyline(latlngs, {
+        pane: 'routePane',
         color: '#C2410C', // Terracotta accent
         weight: 3.5,
-        opacity: 0.9,
+        opacity: 0.95,
         lineCap: 'round',
         lineJoin: 'round',
         dashArray: '6 8'
@@ -335,7 +417,11 @@ export default function MarsTrekMap({
         iconAnchor: [10, 10]
       });
 
-      const marker = L.marker([wp.lat, wp.lng], { icon }).addTo(map);
+      const marker = L.marker([wp.lat, wp.lng], { 
+        icon,
+        pane: 'routePane',
+        zIndexOffset: 700 
+      }).addTo(map);
       customMarkersRef.current.push(marker);
     });
   }, [customWaypoints]);
@@ -347,7 +433,7 @@ export default function MarsTrekMap({
 
     const target = VERIFIED_TARGETS.find(t => t.id === activeTargetId);
     if (target) {
-      map.flyTo([target.lat, target.lng], Math.max(map.getZoom(), 11), {
+      map.flyTo([target.lat, target.lng], Math.max(map.getZoom(), 12), {
         animate: true,
         duration: 0.8
       });
@@ -379,6 +465,7 @@ export default function MarsTrekMap({
 
       const marker = L.marker([hoveredTraversePoint.lat, hoveredTraversePoint.lng], {
         icon: hoverIcon,
+        pane: 'routePane',
         zIndexOffset: 1000
       }).addTo(map);
 
@@ -398,6 +485,16 @@ export default function MarsTrekMap({
         <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white px-4 py-2 rounded-full text-xs font-mono border border-slate-700 shadow-panel z-20 flex items-center space-x-2 animate-bounce">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <span>CLICK ANYWHERE ON MARS MAP TO PLACE CUSTOM TRAVERSE WAYPOINT</span>
+        </div>
+      )}
+
+      {/* High-Res HiRISE Zoom Indicator Pill (appears when zoom >= 11 and Celestia is active) */}
+      {activeMapMode === 'CELESTIA' && currentZoom >= 11 && (
+        <div className="absolute top-4 left-4 bg-slate-950/85 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg border border-slate-700 shadow-panel z-20 text-[11px] font-mono flex items-center space-x-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>
+            {currentZoom >= 13 ? 'NASA HiRISE Tier 2: Outcrop Sub-Meter (~0.25 m/px)' : 'NASA HiRISE Tier 1: Western Delta (~0.5 m/px)'}
+          </span>
         </div>
       )}
 
