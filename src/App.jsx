@@ -3,14 +3,19 @@ import HeaderBar from './components/HeaderBar';
 import TraversePlannerDrawer from './components/TraversePlannerDrawer';
 import MarsTrekMap from './components/MarsTrekMap';
 import TargetEvidenceCard from './components/TargetEvidenceCard';
+import ElevationProfileDrawer from './components/ElevationProfileDrawer';
 import SepAlertBanner from './components/SepAlertBanner';
 import EnvHonestyModal from './components/EnvHonestyModal';
 import { VERIFIED_TARGETS, PRESET_SORTIES } from './data/marsDossierData';
 
 export default function App() {
+  // 5 Multi-Domain Planetary Map Modes:
+  // 'OPTICAL', 'THEMIS_IR', 'MOLA_ELEVATION', 'CRISM_SPECTRAL', 'HAZARDS'
+  const [activeMapMode, setActiveMapMode] = useState('OPTICAL');
+
   // Tile Layer Opacities
   const [layerOpacities, setLayerOpacities] = useState({
-    hirise_maxres: 1.0,
+    hirise_maxres: 0.85,
     viking_global: 0.35,
     mola_topo: 0.30,
     themis_day_ir: 0.25
@@ -32,6 +37,9 @@ export default function App() {
   // SEP Alert State
   const [sepAlertActive, setSepAlertActive] = useState(false);
 
+  // Hovered Traverse Point along Elevation Profile
+  const [hoveredTraversePoint, setHoveredTraversePoint] = useState(null);
+
   const handleOpacityChange = (layerId, newOpacity) => {
     setLayerOpacities(prev => ({
       ...prev,
@@ -51,10 +59,9 @@ export default function App() {
 
   const handleSelectSortie = (sortieId) => {
     setActiveSortieId(sortieId);
-    setCustomWaypoints([]); // Switch back to preset sortie
+    setCustomWaypoints([]);
     setIsPlacingWaypoint(false);
 
-    // If sortie 1 selected, focus on T7
     if (sortieId === 'sortie-1') {
       setActiveTargetId('T7');
     } else if (sortieId === 'sortie-2') {
@@ -62,7 +69,6 @@ export default function App() {
     }
   };
 
-  const activeSortie = PRESET_SORTIES.find(s => s.id === activeSortieId) || PRESET_SORTIES[0];
   const activeTarget = VERIFIED_TARGETS.find(t => t.id === activeTargetId) || null;
 
   return (
@@ -86,8 +92,10 @@ export default function App() {
 
       {/* Main Full-Viewport Spatial Workspace */}
       <main className="flex-1 w-full h-[calc(100vh-68px)] relative flex overflow-hidden">
-        {/* Left Floating Drawer: Traverse Planner & HiRISE Layer Opacities */}
+        {/* Left Floating Drawer: Traverse Planner & 5 Planetary Map Modes */}
         <TraversePlannerDrawer
+          activeMapMode={activeMapMode}
+          onSelectMapMode={setActiveMapMode}
           layerOpacities={layerOpacities}
           onOpacityChange={handleOpacityChange}
           activeSortieId={activeSortieId}
@@ -101,17 +109,29 @@ export default function App() {
           onOpenEnvHonestyModal={() => setIsEnvHonestyOpen(true)}
         />
 
-        {/* Center: Max-Resolution NASA Mars Trek Satellite Map Engine (Leaflet) */}
-        <div className="flex-1 h-full relative overflow-hidden">
-          <MarsTrekMap
-            layerOpacities={layerOpacities}
-            activeTargetId={activeTargetId}
+        {/* Center: Max-Resolution Satellite & Topographic Canvas Engine (Leaflet) */}
+        <div className="flex-1 h-full relative flex flex-col overflow-hidden">
+          <div className="flex-1 w-full h-full relative overflow-hidden">
+            <MarsTrekMap
+              activeMapMode={activeMapMode}
+              layerOpacities={layerOpacities}
+              activeTargetId={activeTargetId}
+              onSelectTarget={setActiveTargetId}
+              activeSortieId={activeSortieId}
+              onSelectSortie={handleSelectSortie}
+              customWaypoints={customWaypoints}
+              onAddCustomWaypoint={handleAddCustomWaypoint}
+              isPlacingWaypoint={isPlacingWaypoint}
+              sepAlertActive={sepAlertActive}
+              hoveredTraversePoint={hoveredTraversePoint}
+            />
+          </div>
+
+          {/* Collapsible Bottom Drawer: Along-Track Elevation Profile (Figure 2) */}
+          <ElevationProfileDrawer
+            onHoverPoint={setHoveredTraversePoint}
+            hoveredPoint={hoveredTraversePoint}
             onSelectTarget={setActiveTargetId}
-            activeSortie={activeSortie}
-            customWaypoints={customWaypoints}
-            onAddCustomWaypoint={handleAddCustomWaypoint}
-            isPlacingWaypoint={isPlacingWaypoint}
-            sepAlertActive={sepAlertActive}
           />
         </div>
 

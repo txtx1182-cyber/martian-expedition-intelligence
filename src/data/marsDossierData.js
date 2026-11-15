@@ -1,5 +1,5 @@
 // MISSION 001 / JEZERO EXPEDITION INTELLIGENCE
-// Master Scientific Research Dossier: 9 Verified Targets (T1-T9), Exact PDS Product IDs, & Epistemological Evidence Chains
+// Master Scientific Research Dossier: 9 Verified Targets (T1-T9), Full Traverse Path, & Exact Epistemology
 // NASA Space Apps Challenge 2026 - Challenge 11: Interplanetary Survival Guide
 
 export const MARS_CONSTANTS = {
@@ -16,7 +16,7 @@ export const MISSION_HEADER = {
   subtitle: "Max-Resolution Planetary Surface & Astronaut Traverse Planning Platform",
   challenge: "NASA Space Apps Challenge 2026 // Challenge 11: Interplanetary Survival Guide: Martian Map",
   region: "Jezero Crater, Mars (18.47°N, 77.37°E)",
-  defaultCenter: [18.4968, 77.3045], // Micro-focus between Neretva (T6) and Bright Angel (T7)
+  defaultCenter: [18.4968, 77.3045], // Focus on Neretva (T6) and Bright Angel (T7)
   defaultZoom: 16
 };
 
@@ -381,17 +381,17 @@ export const PRESET_SORTIES = [
   {
     id: "sortie-1",
     name: "Sortie 1: Neretva → Bright Angel Micro-EVA",
-    badge: "PRIMARY SCIENCE FOCUS (~170 m)",
+    badge: "PRIMARY SCIENCE (~170 m)",
     targetIds: ["T6", "T7"],
     center: [18.4968, 77.3045],
-    zoom: 18,
+    zoom: 17,
     straightLineDistanceM: 172,
     traverseDistanceM: 242,
     elevationDeltaM: 8.3,
     meanGradePct: 3.5,
     maxSlopeDeg: 6.2,
     durationMin: 28,
-    description: "High-resolution micro-EVA traverse from the Neretva valley floor (T6) directly to the Cheyava Falls potential biosignature outcrop (T7). At zoom 18, individual bedrock slabs and HiRISE 0.25 m/px features are visible."
+    description: "High-resolution micro-EVA traverse from Neretva channel floor (T6) directly to the Cheyava Falls potential biosignature outcrop (T7). At zoom 17+, individual bedrock slabs and HiRISE 0.25 m/px features are visible."
   },
   {
     id: "sortie-2",
@@ -411,7 +411,7 @@ export const PRESET_SORTIES = [
   {
     id: "corridor-full",
     name: "Full Research Corridor Context (T1 → T7)",
-    badge: "SCIENTIFIC REFERENCE ONLY (37.2 km)",
+    badge: "SCIENTIFIC REFERENCE (37.2 km)",
     targetIds: ["T1", "T2", "T3", "T4", "T5", "T6", "T7"],
     center: [18.468, 77.375],
     zoom: 13,
@@ -423,6 +423,126 @@ export const PRESET_SORTIES = [
     durationMin: 480,
     isReferenceOnly: true,
     warning: "SCIENTIFIC RESEARCH TRANSECT — NOT A CERTIFIED SINGLE HUMAN MARSWALK ROUTE (Exceeds 8h EVA limit; multi-day rover mission profile)."
+  }
+];
+
+// Continuous multi-point full traverse track (T1 -> T9) with interpolated coordinates & elevations
+// Modeled directly from Figure 1 & Figure 2 of research brief
+export const FULL_TRAVERSE_TRACK = [
+  { id: "p1", name: "T1 Landing", lat: 18.4446, lng: 77.4509, elevation: -2569.9, distKm: 0.0, slopeDeg: 1.2, unit: "Floor Basalt" },
+  { id: "p2", name: "Floor Ridge Waypoint", lat: 18.4390, lng: 77.4470, elevation: -2570.8, distKm: 1.4, slopeDeg: 1.5, unit: "Floor Basalt" },
+  { id: "p3", name: "T2 Séítah Contact", lat: 18.4325, lng: 77.4407, elevation: -2571.8, distKm: 2.8, slopeDeg: 2.4, unit: "Séítah Olivine" },
+  { id: "p4", name: "Séítah Basin North", lat: 18.4480, lng: 77.4380, elevation: -2565.0, distKm: 5.2, slopeDeg: 2.0, unit: "Séítah / Máaz Transition" },
+  { id: "p5", name: "T3 Máaz Formation", lat: 18.4619, lng: 77.4361, elevation: -2555.2, distKm: 7.9, slopeDeg: 2.8, unit: "Máaz Basaltic Cap" },
+  { id: "p6", name: "Floor/Delta Valley Crossing", lat: 18.4720, lng: 77.4050, elevation: -2510.0, distKm: 12.4, slopeDeg: 4.5, unit: "Delta Silt Apron" },
+  { id: "p7", name: "T4 Delta Front (Shenandoah)", lat: 18.4827, lng: 77.3686, elevation: -2421.1, distKm: 17.6, slopeDeg: 8.2, unit: "Shenandoah Mudstones" },
+  { id: "p8", name: "Hawksbill Gap Terrace", lat: 18.4900, lng: 77.3550, elevation: -2408.0, distKm: 21.2, slopeDeg: 6.4, unit: "Delta Sandstones" },
+  { id: "p9", name: "T5 Upper Delta Fan", lat: 18.4954, lng: 77.3466, elevation: -2398.5, distKm: 24.8, slopeDeg: 11.2, unit: "Boulder Conglomerate" },
+  { id: "p10", name: "Neretva Inflow Spillway", lat: 18.4958, lng: 77.3200, elevation: -2380.0, distKm: 29.5, slopeDeg: 5.0, unit: "Fluvial Channel Sand" },
+  { id: "p11", name: "T6 Neretva Channel Floor", lat: 18.4961, lng: 77.3038, elevation: -2362.8, distKm: 33.6, slopeDeg: 3.5, unit: "Neretva Valley Bedrock" },
+  { id: "p12", name: "Cheyava Falls Outcrop (T7)", lat: 18.4974, lng: 77.3051, elevation: -2354.5, distKm: 33.8, slopeDeg: 4.8, unit: "Bright Angel Mudstones" },
+  { id: "p13", name: "Crater Rim Ascent Corridor", lat: 18.4800, lng: 77.2850, elevation: -2100.0, distKm: 38.4, slopeDeg: 14.2, unit: "Talus & Ridge Flank" },
+  { id: "p14", name: "T8 Margin Unit Ridge", lat: 18.4606, lng: 77.2647, elevation: -1820.0, distKm: 42.1, slopeDeg: 17.8, unit: "Marginal Carbonates" },
+  { id: "p15", name: "West Rim Peak (T9)", lat: 18.4220, lng: 77.2207, elevation: -1973.6, distKm: 48.6, slopeDeg: 22.0, unit: "Noachian Basement Megabreccia" }
+];
+
+// CRISM Spectral Mineralogy Polygons (Geospatial boundaries over Jezero units)
+export const CRISM_MINERAL_POLYGONS = [
+  {
+    id: "poly-olivine",
+    name: "Olivine + Mg-Fe Grain-Boundary Carbonates",
+    mineral: "Olivine (Fo45-Fo65) & Mg-Fe Carbonates",
+    color: "#10B981", // Emerald
+    fillColor: "#10B981",
+    fillOpacity: 0.35,
+    weight: 2,
+    targetAnchor: "T2 Séítah",
+    coords: [
+      [18.4200, 77.4250],
+      [18.4420, 77.4280],
+      [18.4500, 77.4480],
+      [18.4350, 77.4600],
+      [18.4180, 77.4450]
+    ]
+  },
+  {
+    id: "poly-smectite",
+    name: "Fe/Mg Phyllosilicates & Smectite Clays",
+    mineral: "Fe/Mg Smectites (Nontronite / Saponite)",
+    color: "#0284C7", // Cyan
+    fillColor: "#0284C7",
+    fillOpacity: 0.35,
+    weight: 2,
+    targetAnchor: "T4 Delta Front & T5 Upper Delta",
+    coords: [
+      [18.4750, 77.3400],
+      [18.5020, 77.3350],
+      [18.5080, 77.3600],
+      [18.4900, 77.3850],
+      [18.4720, 77.3750]
+    ]
+  },
+  {
+    id: "poly-redox",
+    name: "Vivianite (Fe-PO4) & Greigite (Fe-S) Redox Front",
+    mineral: "Vivianite, Greigite, Calcium Sulfate & Organic Carbon",
+    color: "#D97706", // Amber
+    fillColor: "#D97706",
+    fillOpacity: 0.40,
+    weight: 2.5,
+    targetAnchor: "T6 Neretva & T7 Bright Angel",
+    coords: [
+      [18.4920, 77.2980],
+      [18.5030, 77.2990],
+      [18.5040, 77.3120],
+      [18.4940, 77.3140]
+    ]
+  },
+  {
+    id: "poly-carbonate-margin",
+    name: "Lacustrine Shoreline Carbonates",
+    mineral: "Magnesite, Hydrated Carbonates & Siliceous Chert",
+    color: "#7C3AED", // Violet
+    fillColor: "#7C3AED",
+    fillOpacity: 0.35,
+    weight: 2,
+    targetAnchor: "T8 Margin Unit",
+    coords: [
+      [18.4480, 77.2500],
+      [18.4750, 77.2550],
+      [18.4800, 77.2800],
+      [18.4550, 77.2780]
+    ]
+  }
+];
+
+// Terrain Slope Hazard Scarp Zones (> 15° slope)
+export const SLOPE_HAZARD_ZONES = [
+  {
+    id: "hazard-delta-scarp",
+    name: "Delta Front Scarp Face (16°–22° Slope)",
+    color: "#EF4444",
+    fillColor: "#EF4444",
+    fillOpacity: 0.45,
+    coords: [
+      [18.4810, 77.3640],
+      [18.4880, 77.3620],
+      [18.4910, 77.3710],
+      [18.4830, 77.3730]
+    ]
+  },
+  {
+    id: "hazard-west-rim",
+    name: "Western Crater Rim Cliff (> 20° Slope)",
+    color: "#EF4444",
+    fillColor: "#EF4444",
+    fillOpacity: 0.45,
+    coords: [
+      [18.4150, 77.2100],
+      [18.4700, 77.2400],
+      [18.4650, 77.2550],
+      [18.4100, 77.2250]
+    ]
   }
 ];
 
@@ -483,7 +603,7 @@ export const NASA_TILE_LAYERS = [
   }
 ];
 
-// Mars Spherical Distance Calculation helper
+// Helper: Mars Spherical Great-Circle Distance (Meters)
 export function calculateMarsDistanceMeters(lat1, lon1, lat2, lon2) {
   const R = MARS_CONSTANTS.MEAN_RADIUS_METERS;
   const dLat = (lat2 - lat1) * Math.PI / 180;
