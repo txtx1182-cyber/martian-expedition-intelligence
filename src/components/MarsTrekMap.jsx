@@ -2,12 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { 
   VERIFIED_TARGETS, 
-  PRESET_SORTIES, 
-  FULL_TRAVERSE_TRACK,
-  CRISM_MINERAL_POLYGONS,
-  SLOPE_HAZARD_ZONES,
-  NASA_TILE_LAYERS,
-  calculateMarsDistanceKm
+  CRISM_MINERAL_POLYGONS, 
+  SLOPE_HAZARD_ZONES 
 } from '../data/marsDossierData';
 
 export default function MarsTrekMap({
@@ -15,20 +11,18 @@ export default function MarsTrekMap({
   layerOpacities = {},
   activeTargetId,
   onSelectTarget,
-  activeSortieId,
-  onSelectSortie,
-  customWaypoints = [],
-  onAddCustomWaypoint,
-  isPlacingWaypoint,
-  sepAlertActive,
+  activeRoutePoints = [],
+  flyToRouteTrigger = 0,
+  isMapClickWaypointMode = false,
+  onMapClickAddWaypoint,
   hoveredTraversePoint
 }) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const tileLayersRef = useRef({});
   const markersRef = useRef({});
-  const customMarkersRef = useRef([]);
-  const expeditionPolylineRef = useRef(null);
+  const routePolylineRef = useRef(null);
+  const routeBadgeMarkersRef = useRef([]);
   const crismLayerGroupRef = useRef(null);
   const hazardLayerGroupRef = useRef(null);
   const hoverMarkerRef = useRef(null);
@@ -40,11 +34,19 @@ export default function MarsTrekMap({
   // Map Zoom State
   const [currentZoom, setCurrentZoom] = useState(11);
 
+  // Estimate elevation in Jezero from planetocentric lat/lng
+  const estimateElevation = (lat, lng) => {
+    // Basin floor is ~-2570m in the east, delta is ~-2400m, Neretva is ~-2350m, western rim is ~-1800m
+    const westDist = Math.max(0, 77.45 - lng);
+    const northDist = Math.abs(lat - 18.48);
+    const elev = -2570 + (westDist * 3200) + (northDist * 1200);
+    return Math.round(Math.min(-1600, Math.max(-2650, elev)));
+  };
+
   // Initialize Leaflet Map (Standard Web Mercator EPSG:3857)
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
-    // Centered at Greater Jezero Basin [18.45, 77.40] with regional zoom 11
     const map = L.map(mapContainerRef.current, {
       center: [18.45, 77.40],
       zoom: 11,
@@ -87,7 +89,6 @@ export default function MarsTrekMap({
     // ==========================================================
     // 1. REAL VERIFIED WEB MERCATOR SATELLITE TILE LAYERS
     // ==========================================================
-    // Base Optical: OpenPlanetaryMap / CARTO Mars Viking MDIM 2.1
     const opticalLayer = L.tileLayer(
       'https://cartocdn-gusc.global.ssl.fastly.net/opmbuilder/api/v1/map/named/opm-mars-basemap-v0-2/all/{z}/{x}/{y}.png',
       {
@@ -99,7 +100,6 @@ export default function MarsTrekMap({
       }
     ).addTo(map);
 
-    // MOLA Colorized Relief (WhereOnMars AWS S3)
     const molaColorLayer = L.tileLayer(
       'https://s3-eu-west-1.amazonaws.com/whereonmars.cartodb.net/mola-color/{z}/{x}/{y}.png',
       {
@@ -112,7 +112,6 @@ export default function MarsTrekMap({
       }
     ).addTo(map);
 
-    // MOLA Grayscale Hillshade Relief (WhereOnMars AWS S3)
     const molaGrayLayer = L.tileLayer(
       'https://s3-eu-west-1.amazonaws.com/whereonmars.cartodb.net/mola-gray/{z}/{x}/{y}.png',
       {
@@ -125,7 +124,6 @@ export default function MarsTrekMap({
       }
     ).addTo(map);
 
-    // Celestia 16k Shaded Global Mosaic (WhereOnMars AWS S3)
     const celestiaLayer = L.tileLayer(
       'https://s3-eu-west-1.amazonaws.com/whereonmars.cartodb.net/celestia_mars-shaded-16k_global/{z}/{x}/{y}.png',
       {
@@ -148,8 +146,6 @@ export default function MarsTrekMap({
     // ==========================================================
     // 2. ZOOM-TRIGGERED GEOREFERENCED HIGH-RES NASA HiRISE OVERLAYS
     // ==========================================================
-    // Tier 1 Overlay: Broader Western Delta Fan, Neretva Inlet, Kodiak, and Floor
-    // Bounding Box: [[18.425, 77.275], [18.525, 77.455]]
     const tier1Overlay = L.imageOverlay(
       '/maps/Layered Martian Delta and Cratered Plains.png',
       [[18.425, 77.275], [18.525, 77.455]],
@@ -161,8 +157,6 @@ export default function MarsTrekMap({
     ).addTo(map);
     tier1OverlayRef.current = tier1Overlay;
 
-    // Tier 2 Overlay: Ultra-High-Res Upper Delta, Neretva Floor & Bright Angel Outcrop
-    // Bounding Box: [[18.458, 77.272], [18.515, 77.375]]
     const tier2Overlay = L.imageOverlay(
       '/maps/Martian Cratered Sediment Landscape.png',
       [[18.458, 77.272], [18.515, 77.375]],
@@ -183,7 +177,7 @@ export default function MarsTrekMap({
         color: poly.color,
         fillColor: poly.fillColor,
         fillOpacity: poly.fillOpacity,
-        weight: poly.weight,
+        weight: 2,
         dashArray: '4 4'
       }).addTo(crismGroup);
 
@@ -223,7 +217,7 @@ export default function MarsTrekMap({
     hazardLayerGroupRef.current = hazardGroup;
 
     // ==========================================================
-    // 5. RESEARCH TARGET MARKERS (T1–T7)
+    // 5. RESEARCH TARGET MARKERS (T1–T9)
     // Strictly in markerPane above all image overlays
     // ==========================================================
     VERIFIED_TARGETS.forEach(target => {
@@ -275,16 +269,6 @@ export default function MarsTrekMap({
       markersRef.current[target.id] = marker;
     });
 
-    // Custom Waypoint Click Handler
-    map.on('click', (e) => {
-      if (isPlacingWaypoint && onAddCustomWaypoint) {
-        onAddCustomWaypoint({
-          lat: parseFloat(e.latlng.lat.toFixed(4)),
-          lng: parseFloat(e.latlng.lng.toFixed(4))
-        });
-      }
-    });
-
     mapInstanceRef.current = map;
 
     return () => {
@@ -292,6 +276,27 @@ export default function MarsTrekMap({
       mapInstanceRef.current = null;
     };
   }, []);
+
+  // Map Click Listener for Waypoint Placement
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    const handleClick = (e) => {
+      if (isMapClickWaypointMode && onMapClickAddWaypoint) {
+        const lat = parseFloat(e.latlng.lat.toFixed(6));
+        const lng = parseFloat(e.latlng.lng.toFixed(6));
+        const elevation = estimateElevation(lat, lng);
+        onMapClickAddWaypoint({ lat, lng, elevation });
+      }
+    };
+
+    map.on('click', handleClick);
+
+    return () => {
+      map.off('click', handleClick);
+    };
+  }, [isMapClickWaypointMode, onMapClickAddWaypoint]);
 
   // Update Tile Layer Opacities and Blend Modes
   useEffect(() => {
@@ -320,7 +325,6 @@ export default function MarsTrekMap({
       if (layers.mola_gray) layers.mola_gray.setOpacity(0.0);
       if (layers.celestia_shaded) layers.celestia_shaded.setOpacity(layerOpacities.celestia_shaded ?? 0.85);
     } else {
-      // Free Blending Mode
       if (layers.mars_optical) layers.mars_optical.setOpacity(layerOpacities.mars_optical ?? 1.0);
       if (layers.mola_color) layers.mola_color.setOpacity(layerOpacities.mola_color ?? 0.65);
       if (layers.mola_gray) layers.mola_gray.setOpacity(layerOpacities.mola_gray ?? 0.50);
@@ -329,7 +333,6 @@ export default function MarsTrekMap({
   }, [activeMapMode, layerOpacities]);
 
   // Manage Zoom-Triggered HiRISE Overlay Fades
-  // ONLY fades in when zoom >= 11 AND active basemap is Celestia 16k True Color!
   useEffect(() => {
     const isCelestiaActive = activeMapMode === 'CELESTIA';
     const tier1 = tier1OverlayRef.current;
@@ -338,93 +341,101 @@ export default function MarsTrekMap({
     if (!tier1 || !tier2) return;
 
     if (!isCelestiaActive || currentZoom < 11) {
-      // Zoom < 11 or non-Celestia basemap: immediately hide both overlays
       tier1.setOpacity(0);
       tier2.setOpacity(0);
     } else if (currentZoom >= 11 && currentZoom < 13) {
-      // Tier 1 High-Res Overlay: zoom 11 to 13
       tier1.setOpacity(0.96);
       tier2.setOpacity(0);
     } else if (currentZoom >= 13) {
-      // Tier 2 Ultra-High-Res Outcrop Zoom: zoom >= 13
       tier1.setOpacity(0.20);
       tier2.setOpacity(0.98);
     }
   }, [activeMapMode, currentZoom]);
 
-  // Update Route Polyline based on Selected Expedition or Custom Waypoints
+  // Render Live Route Polyline and Directional Sequence Badges (1, 2, 3...)
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    if (expeditionPolylineRef.current) {
-      map.removeLayer(expeditionPolylineRef.current);
-      expeditionPolylineRef.current = null;
+    // Clean old polyline
+    if (routePolylineRef.current) {
+      map.removeLayer(routePolylineRef.current);
+      routePolylineRef.current = null;
     }
 
-    let latlngs = [];
+    // Clean old waypoint badges
+    routeBadgeMarkersRef.current.forEach(m => map.removeLayer(m));
+    routeBadgeMarkersRef.current = [];
 
-    if (customWaypoints && customWaypoints.length > 1) {
-      // Use Custom Waypoints
-      latlngs = customWaypoints.map(wp => [wp.lat, wp.lng]);
-    } else {
-      // Use Active Preset
-      const activeSortie = PRESET_SORTIES.find(s => s.id === activeSortieId) || PRESET_SORTIES[0];
-      const targetMap = {};
-      VERIFIED_TARGETS.forEach(t => { targetMap[t.id] = t; });
+    if (activeRoutePoints && activeRoutePoints.length >= 2) {
+      const latlngs = activeRoutePoints.map(p => [p.lat, p.lng]);
 
-      latlngs = activeSortie.targetIds
-        .map(id => targetMap[id])
-        .filter(Boolean)
-        .map(t => [t.lat, t.lng]);
-    }
-
-    if (latlngs.length >= 2) {
+      // High-contrast Terracotta Route Polyline strictly in routePane
       const polyline = L.polyline(latlngs, {
         pane: 'routePane',
-        color: '#C2410C', // Terracotta accent
-        weight: 3.5,
+        color: '#C2410C', // Mars Terracotta
+        weight: 4,
         opacity: 0.95,
         lineCap: 'round',
         lineJoin: 'round',
-        dashArray: '6 8'
+        dashArray: 'none'
       }).addTo(map);
 
-      expeditionPolylineRef.current = polyline;
-    }
-  }, [activeSortieId, customWaypoints]);
+      routePolylineRef.current = polyline;
 
-  // Handle Custom Waypoint Markers
+      // Add directional waypoint sequence badges (1, 2, 3...)
+      activeRoutePoints.forEach((pt, idx) => {
+        const isStart = idx === 0;
+        const isEnd = idx === activeRoutePoints.length - 1;
+
+        const badgeHtml = `
+          <div class="flex items-center justify-center w-6 h-6 rounded-full border-2 border-white shadow-md font-mono text-[11px] font-bold transform -translate-x-1/2 -translate-y-1/2 ${
+            isStart ? 'bg-emerald-600 text-white ring-2 ring-emerald-300' : (isEnd ? 'bg-amber-600 text-white ring-2 ring-amber-300' : 'bg-slate-900 text-white')
+          }">
+            ${idx + 1}
+          </div>
+        `;
+
+        const badgeIcon = L.divIcon({
+          html: badgeHtml,
+          className: 'leaflet-route-sequence-badge',
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        });
+
+        const badgeMarker = L.marker([pt.lat, pt.lng], {
+          icon: badgeIcon,
+          pane: 'routePane',
+          zIndexOffset: 750
+        }).addTo(map);
+
+        badgeMarker.bindTooltip(
+          `<div class="p-1 font-mono text-xs">
+            <strong>Stop ${idx + 1}: ${pt.name || pt.id}</strong><br/>
+            <span class="text-slate-600">${pt.lat.toFixed(4)}°N, ${pt.lng.toFixed(4)}°E | ${pt.elevation} m</span>
+          </div>`,
+          { offset: [0, -12], direction: 'top' }
+        );
+
+        routeBadgeMarkersRef.current.push(badgeMarker);
+      });
+    }
+  }, [activeRoutePoints]);
+
+  // Handle Fly-To Route Trigger
   useEffect(() => {
     const map = mapInstanceRef.current;
-    if (!map) return;
+    if (!map || !routePolylineRef.current) return;
 
-    // Clean old custom markers
-    customMarkersRef.current.forEach(m => map.removeLayer(m));
-    customMarkersRef.current = [];
-
-    customWaypoints.forEach((wp, idx) => {
-      const markerHtml = `
-        <div class="flex items-center justify-center w-5 h-5 rounded-full bg-cobalt-600 text-white font-mono text-[10px] font-bold border border-white shadow-md">
-          W${idx + 1}
-        </div>
-      `;
-
-      const icon = L.divIcon({
-        html: markerHtml,
-        className: 'leaflet-custom-waypoint',
-        iconSize: [20, 20],
-        iconAnchor: [10, 10]
+    if (activeRoutePoints && activeRoutePoints.length >= 2) {
+      map.fitBounds(routePolylineRef.current.getBounds(), {
+        padding: [60, 60],
+        maxZoom: 16,
+        animate: true,
+        duration: 0.9
       });
-
-      const marker = L.marker([wp.lat, wp.lng], { 
-        icon,
-        pane: 'routePane',
-        zIndexOffset: 700 
-      }).addTo(map);
-      customMarkersRef.current.push(marker);
-    });
-  }, [customWaypoints]);
+    }
+  }, [flyToRouteTrigger]);
 
   // Pan to Active Target when Selected
   useEffect(() => {
@@ -477,18 +488,18 @@ export default function MarsTrekMap({
     <div className="w-full h-full relative select-none">
       <div 
         ref={mapContainerRef} 
-        className={`w-full h-full bg-[#E2E8F0] ${isPlacingWaypoint ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing'}`}
+        className={`w-full h-full bg-[#E2E8F0] ${isMapClickWaypointMode ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing'}`}
       />
 
       {/* Crosshair Placement Banner */}
-      {isPlacingWaypoint && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white px-4 py-2 rounded-full text-xs font-mono border border-slate-700 shadow-panel z-20 flex items-center space-x-2 animate-bounce">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>CLICK ANYWHERE ON MARS MAP TO PLACE CUSTOM TRAVERSE WAYPOINT</span>
+      {isMapClickWaypointMode && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white px-4 py-2 rounded-full text-xs font-mono border border-amber-500 shadow-panel z-20 flex items-center space-x-2 animate-bounce">
+          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+          <span>MAP CLICK MODE: ON — CLICK ANYWHERE ON MAP TO DROP WAYPOINTS</span>
         </div>
       )}
 
-      {/* High-Res HiRISE Zoom Indicator Pill (appears when zoom >= 11 and Celestia is active) */}
+      {/* High-Res HiRISE Zoom Indicator Pill */}
       {activeMapMode === 'CELESTIA' && currentZoom >= 11 && (
         <div className="absolute top-4 left-4 bg-slate-950/85 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg border border-slate-700 shadow-panel z-20 text-[11px] font-mono flex items-center space-x-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -502,6 +513,10 @@ export default function MarsTrekMap({
       <div className="absolute bottom-6 right-4 bg-white/95 backdrop-blur-sm border border-slate-300 rounded-lg p-2.5 shadow-panel z-10 text-[11px] font-mono space-y-1.5 max-w-[240px]">
         <div className="text-[10px] font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-1">
           Planetary Map Overlays
+        </div>
+        <div className="flex items-center space-x-2 text-slate-700">
+          <span className="w-3 h-1.5 bg-[#C2410C] rounded"></span>
+          <span>Active EVA Route Track</span>
         </div>
         <div className="flex items-center space-x-2 text-slate-700">
           <span className="w-3 h-1.5 bg-[#10B981] rounded"></span>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import HeaderBar from './components/HeaderBar';
 import TraversePlannerDrawer from './components/TraversePlannerDrawer';
 import MarsTrekMap from './components/MarsTrekMap';
@@ -21,15 +21,26 @@ export default function App() {
     celestia_shaded: 0.40
   });
 
-  // Active Target ID (Default to T4 Bright Angel / Cheyava Falls)
-  const [activeTargetId, setActiveTargetId] = useState('T4');
+  // Active Target ID (Default to T7 Bright Angel / Cheyava Falls)
+  const [activeTargetId, setActiveTargetId] = useState('T7');
 
-  // Active Sortie / Expedition ID (Default to Preset 1: Full Basin Transect ~55.6 km)
-  const [activeSortieId, setActiveSortieId] = useState('preset-1');
+  // Route Planner Tabs: 'SORTIES' | 'BUILD_EVA' | 'LAYERS'
+  const [routeTab, setRouteTab] = useState('SORTIES');
 
-  // Custom User Placed Waypoints
-  const [customWaypoints, setCustomWaypoints] = useState([]);
-  const [isPlacingWaypoint, setIsPlacingWaypoint] = useState(false);
+  // Active Sortie ID (Default to sortie-1: Neretva -> Bright Angel Micro-EVA)
+  const [activeSortieId, setActiveSortieId] = useState('sortie-1');
+
+  // Custom User Placed / Built Route Waypoints
+  const [customRouteWaypoints, setCustomRouteWaypoints] = useState([]);
+
+  // Map Click Waypoint Mode toggle
+  const [isMapClickWaypointMode, setIsMapClickWaypointMode] = useState(false);
+
+  // Astronaut walking speed in m/s (default 0.5 m/s)
+  const [astronautSpeedMs, setAstronautSpeedMs] = useState(0.5);
+
+  // Auto-fit "Fly to Route" trigger counter
+  const [flyToRouteTrigger, setFlyToRouteTrigger] = useState(0);
 
   // Environmental Honesty Modal State
   const [isEnvHonestyOpen, setIsEnvHonestyOpen] = useState(false);
@@ -47,26 +58,83 @@ export default function App() {
     }));
   };
 
-  const handleAddCustomWaypoint = (latlng) => {
-    if (!isPlacingWaypoint) return;
-    setCustomWaypoints(prev => [...prev, latlng]);
-  };
-
-  const handleClearCustomWaypoints = () => {
-    setCustomWaypoints([]);
-    setIsPlacingWaypoint(false);
-  };
+  // Compute active route points based on active tab
+  const activeRoutePoints = useMemo(() => {
+    if (routeTab === 'BUILD_EVA') {
+      return customRouteWaypoints;
+    }
+    // Default to active sortie
+    const sortie = PRESET_SORTIES.find(s => s.id === activeSortieId) || PRESET_SORTIES[0];
+    return sortie.targetIds.map(tid => {
+      const t = VERIFIED_TARGETS.find(vt => vt.id === tid);
+      if (!t) return null;
+      return {
+        id: t.id,
+        name: t.name,
+        targetId: t.id,
+        lat: t.lat,
+        lng: t.lng,
+        elevation: t.elevation
+      };
+    }).filter(Boolean);
+  }, [routeTab, activeSortieId, customRouteWaypoints]);
 
   const handleSelectSortie = (sortieId) => {
     setActiveSortieId(sortieId);
-    setCustomWaypoints([]);
-    setIsPlacingWaypoint(false);
+    setRouteTab('SORTIES');
+    setIsMapClickWaypointMode(false);
+    setFlyToRouteTrigger(prev => prev + 1);
 
-    if (sortieId === 'preset-1') {
-      setActiveTargetId('T4');
-    } else if (sortieId === 'preset-2') {
-      setActiveTargetId('T3');
+    const sortie = PRESET_SORTIES.find(s => s.id === sortieId);
+    if (sortie && sortie.targetIds && sortie.targetIds.length > 0) {
+      setActiveTargetId(sortie.targetIds[0]);
     }
+  };
+
+  const handleAddTargetToRoute = (targetId) => {
+    const target = VERIFIED_TARGETS.find(t => t.id === targetId);
+    if (!target) return;
+    const newPoint = {
+      id: target.id,
+      name: target.name,
+      targetId: target.id,
+      lat: target.lat,
+      lng: target.lng,
+      elevation: target.elevation
+    };
+    setCustomRouteWaypoints(prev => [...prev, newPoint]);
+    setRouteTab('BUILD_EVA');
+    setFlyToRouteTrigger(prev => prev + 1);
+  };
+
+  const handleRemoveWaypoint = (index) => {
+    setCustomRouteWaypoints(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleUndoLastWaypoint = () => {
+    setCustomRouteWaypoints(prev => prev.slice(0, -1));
+  };
+
+  const handleClearCustomRoute = () => {
+    setCustomRouteWaypoints([]);
+    setIsMapClickWaypointMode(false);
+  };
+
+  const handleMapClickAddWaypoint = ({ lat, lng, elevation }) => {
+    const wpNum = customRouteWaypoints.length + 1;
+    const newWp = {
+      id: `WP-${wpNum}`,
+      name: `Waypoint ${wpNum}`,
+      lat,
+      lng,
+      elevation
+    };
+    setCustomRouteWaypoints(prev => [...prev, newWp]);
+    setRouteTab('BUILD_EVA');
+  };
+
+  const handleFlyToRoute = () => {
+    setFlyToRouteTrigger(prev => prev + 1);
   };
 
   const activeTarget = VERIFIED_TARGETS.find(t => t.id === activeTargetId) || null;
@@ -94,18 +162,27 @@ export default function App() {
       <main className="flex-1 w-full h-[calc(100vh-56px)] relative flex overflow-hidden">
         {/* Left Floating Drawer: Traverse Planner & 4 Planetary Map Modes */}
         <TraversePlannerDrawer
+          activeTab={routeTab}
+          onSelectTab={setRouteTab}
+          activeSortieId={activeSortieId}
+          onSelectSortie={handleSelectSortie}
+          customRouteWaypoints={customRouteWaypoints}
+          onAddTargetToRoute={handleAddTargetToRoute}
+          onRemoveWaypoint={handleRemoveWaypoint}
+          onUndoLastWaypoint={handleUndoLastWaypoint}
+          onClearCustomRoute={handleClearCustomRoute}
+          isMapClickWaypointMode={isMapClickWaypointMode}
+          onToggleMapClickMode={() => setIsMapClickWaypointMode(prev => !prev)}
+          astronautSpeedMs={astronautSpeedMs}
+          onChangeAstronautSpeed={setAstronautSpeedMs}
+          onFlyToRoute={handleFlyToRoute}
+          activeRoutePoints={activeRoutePoints}
           activeMapMode={activeMapMode}
           onSelectMapMode={setActiveMapMode}
           layerOpacities={layerOpacities}
           onOpacityChange={handleOpacityChange}
-          activeSortieId={activeSortieId}
-          onSelectSortie={handleSelectSortie}
           activeTargetId={activeTargetId}
           onSelectTarget={setActiveTargetId}
-          customWaypoints={customWaypoints}
-          onClearCustomWaypoints={handleClearCustomWaypoints}
-          isPlacingWaypoint={isPlacingWaypoint}
-          onTogglePlaceWaypoint={() => setIsPlacingWaypoint(prev => !prev)}
           onOpenEnvHonestyModal={() => setIsEnvHonestyOpen(true)}
         />
 
@@ -117,12 +194,10 @@ export default function App() {
               layerOpacities={layerOpacities}
               activeTargetId={activeTargetId}
               onSelectTarget={setActiveTargetId}
-              activeSortieId={activeSortieId}
-              onSelectSortie={handleSelectSortie}
-              customWaypoints={customWaypoints}
-              onAddCustomWaypoint={handleAddCustomWaypoint}
-              isPlacingWaypoint={isPlacingWaypoint}
-              sepAlertActive={sepAlertActive}
+              activeRoutePoints={activeRoutePoints}
+              flyToRouteTrigger={flyToRouteTrigger}
+              isMapClickWaypointMode={isMapClickWaypointMode}
+              onMapClickAddWaypoint={handleMapClickAddWaypoint}
               hoveredTraversePoint={hoveredTraversePoint}
             />
           </div>
@@ -132,6 +207,7 @@ export default function App() {
             onHoverPoint={setHoveredTraversePoint}
             hoveredPoint={hoveredTraversePoint}
             onSelectTarget={setActiveTargetId}
+            activeRoutePoints={activeRoutePoints}
           />
         </div>
 
@@ -140,6 +216,7 @@ export default function App() {
           <TargetEvidenceCard
             target={activeTarget}
             onClose={() => setActiveTargetId(null)}
+            onAddTargetToRoute={handleAddTargetToRoute}
           />
         )}
       </main>

@@ -9,13 +9,14 @@ import {
   FileText, 
   ShieldCheck, 
   CheckCircle2, 
-  Database,
-  FlaskConical,
-  Eye,
-  Info
+  Database, 
+  FlaskConical, 
+  Eye, 
+  Info,
+  Plus
 } from 'lucide-react';
 
-export default function TargetEvidenceCard({ target, onClose }) {
+export default function TargetEvidenceCard({ target, onClose, onAddTargetToRoute }) {
   if (!target) return null;
 
   const { assessments, pdsProducts, evidenceChain, isPrimaryTarget, isExtended } = target;
@@ -48,6 +49,20 @@ export default function TargetEvidenceCard({ target, onClose }) {
             <span>•</span>
             <span className="text-terracotta-700 font-bold">{target.elevation} m</span>
           </div>
+
+          {/* Add to Route Planner Button */}
+          {onAddTargetToRoute && (
+            <div className="mt-2">
+              <button
+                onClick={() => onAddTargetToRoute(target.id)}
+                className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-terracotta-700 hover:bg-terracotta-800 text-white font-mono text-[11px] font-bold transition-colors shadow-subtle"
+                title="Add this target to Route Planner"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add to Route</span>
+              </button>
+            </div>
+          )}
         </div>
 
         <button
