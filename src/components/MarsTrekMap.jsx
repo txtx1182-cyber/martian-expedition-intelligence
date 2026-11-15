@@ -71,9 +71,9 @@ export default function MarsTrekMap({
       overlayPane.style.pointerEvents = 'none';
     }
 
-    if (!map.getPane('thermalPane')) {
-      const thermalPane = map.createPane('thermalPane');
-      thermalPane.style.zIndex = 480;
+    if (!map.getPane('scientificOverlaysPane')) {
+      const scientificPane = map.createPane('scientificOverlaysPane');
+      scientificPane.style.zIndex = 550;
     }
 
     if (!map.getPane('routePane')) {
@@ -187,6 +187,7 @@ export default function MarsTrekMap({
     const crismGroup = L.layerGroup().addTo(map);
     CRISM_MINERAL_POLYGONS.forEach(poly => {
       const polygon = L.polygon(poly.coords, {
+        pane: 'scientificOverlaysPane',
         color: poly.color,
         fillColor: poly.fillColor,
         fillOpacity: poly.fillOpacity,
@@ -212,6 +213,7 @@ export default function MarsTrekMap({
     SLOPE_HAZARD_ZONES.forEach(zone => {
       const isShelter = zone.type === 'RAD_SHELTER';
       const polygon = L.polygon(zone.coords, {
+        pane: 'scientificOverlaysPane',
         color: zone.color,
         fillColor: zone.fillColor,
         fillOpacity: zone.fillOpacity,
@@ -386,7 +388,7 @@ export default function MarsTrekMap({
     THEMIS_THERMAL_INERTIA_ZONES.forEach(zone => {
       const isHigh = zone.type === 'HIGH_INERTIA_BEDROCK';
       const polygon = L.polygon(zone.coords, {
-        pane: 'thermalPane',
+        pane: 'scientificOverlaysPane',
         color: zone.color,
         fillColor: zone.fillColor,
         fillOpacity: opacity * 0.55,
@@ -423,6 +425,7 @@ export default function MarsTrekMap({
 
     // 1. Regional Dust Opacity Tint
     const dustHaze = L.rectangle(MEDA_ATMOSPHERIC_DATA.dustHazeBounds, {
+      pane: 'scientificOverlaysPane',
       color: '#D97706',
       fillColor: '#D97706',
       fillOpacity: opacity * 0.14,
@@ -442,6 +445,7 @@ export default function MarsTrekMap({
     // 2. Wind Flow Direction Vectors (NW -> SE down Neretva Vallis)
     MEDA_ATMOSPHERIC_DATA.windVectors.forEach(vec => {
       const line = L.polyline(vec.coords, {
+        pane: 'scientificOverlaysPane',
         color: '#0284C7',
         weight: 3,
         dashArray: '8 6',
@@ -640,7 +644,10 @@ export default function MarsTrekMap({
 
       {/* High-Res HiRISE Zoom Indicator Pill */}
       {activeMapMode === 'CELESTIA' && currentZoom >= 11 && (
-        <div className="absolute top-4 left-4 bg-slate-950/85 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg border border-slate-700 shadow-panel z-20 text-[11px] font-mono flex items-center space-x-2">
+        <div 
+          className="absolute top-4 left-4 z-[1000] pointer-events-auto bg-slate-950/85 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg border border-slate-700 shadow-panel text-[11px] font-mono flex items-center space-x-2"
+          style={{ zIndex: 1000 }}
+        >
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <span>
             {currentZoom >= 13 ? 'NASA HiRISE Tier 2: Outcrop Sub-Meter (~0.25 m/px)' : 'NASA HiRISE Tier 1: Western Delta (~0.5 m/px)'}
@@ -651,8 +658,8 @@ export default function MarsTrekMap({
       {/* THEMIS Thermal Inertia Floating Legend Pill (Appears only while thermal layer opacity > 0%) */}
       {thermalOpacity > 0.005 && (
         <div 
-          className="absolute bottom-56 right-4 bg-white/95 backdrop-blur-sm border border-terracotta-400 rounded-xl p-2.5 shadow-lg z-20 text-[10px] font-mono space-y-1.5 max-w-[270px] pointer-events-auto transition-all duration-200"
-          style={{ opacity: Math.min(1, thermalOpacity + 0.25) }}
+          className="absolute bottom-[270px] right-[16px] z-[1000] pointer-events-auto bg-white/95 backdrop-blur-sm border border-terracotta-400 rounded-xl p-2.5 shadow-lg text-[10px] font-mono space-y-1.5 max-w-[270px] transition-all duration-200"
+          style={{ zIndex: 1000, opacity: Math.min(1, thermalOpacity + 0.25) }}
         >
           <div className="flex items-center justify-between border-b border-slate-200 pb-1">
             <span className="font-bold text-slate-900 flex items-center space-x-1.5 font-display text-xs">
@@ -688,8 +695,11 @@ export default function MarsTrekMap({
         </div>
       )}
 
-      {/* Map Legend Overlay (Bottom-Right) */}
-      <div className="absolute bottom-6 right-4 bg-white/95 backdrop-blur-sm border border-slate-300 rounded-lg p-2.5 shadow-panel z-10 text-[11px] font-mono space-y-1.5 max-w-[240px]">
+      {/* Map Legend Overlay (Bottom-Right, strictly positioned at bottom: 44px; right: 16px; with zIndex: 1000) */}
+      <div 
+        className="absolute bottom-[44px] right-[16px] z-[1000] pointer-events-auto bg-white/95 backdrop-blur-sm border border-slate-300 rounded-lg p-2.5 shadow-panel text-[11px] font-mono space-y-1.5 max-w-[240px]"
+        style={{ zIndex: 1000 }}
+      >
         <div className="text-[10px] font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-1">
           Planetary Map Overlays
         </div>
